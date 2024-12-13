@@ -6,17 +6,17 @@ import torch
 
 @cache
 def get_rank() -> int:
-    return int(os.environ["RANK"])
+    return int(os.getenv("RANK", 0))
 
 
 @cache
 def get_local_rank() -> int:
-    return int(os.environ["LOCAL_RANK"])
+    return int(os.getenv("LOCAL_RANK", 0))
 
 
 @cache
 def get_world_size() -> int:
-    return int(os.environ["WORLD_SIZE"])
+    return int(os.getenv("WORLD_SIZE", 1))
 
 
 @cache
