@@ -14,8 +14,3 @@ class TestGraphs:
         print(nodes)
         for n in nodes:
             assert isinstance(n, torch.fx.node.Node)
-
-
-if __name__ == "__main__":
-    t = TestGraphs()
-    t.test_get_graph()
