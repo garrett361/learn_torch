@@ -1,0 +1,60 @@
+
+<html>
+<body>
+<h2>Guards</h2>
+<ul>
+
+    <li><code>___check_type_id(L[&#39;fn&#39;], 161403600)</code></li>
+
+    <li><code>___check_obj_id(L[&#39;fn&#39;], 23146373708864)</code></li>
+
+    <li><code>___check_type_id(L[&#39;args&#39;], 23149446187968)</code></li>
+
+    <li><code>len(L[&#39;args&#39;]) == 1</code></li>
+
+    <li><code>___check_type_id(L[&#39;kwargs&#39;], 23149446166752)</code></li>
+
+    <li><code>not L[&#39;kwargs&#39;]</code></li>
+
+    <li><code>list(L[&#39;kwargs&#39;].keys()) == []</code></li>
+
+    <li><code>utils_device.CURRENT_DEVICE == None</code></li>
+
+    <li><code>___check_current_backend(23146317747680)</code></li>
+
+</ul>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Append the current URL's query parameters to all relative links on the page
+        const queryParams = new URLSearchParams(window.location.search);
+        if (queryParams.size === 0) return url; // No query params, return original URL
+
+        function appendQueryParams(url) {
+            const newURL = new URL((new Request(url)).url);  // new URL(<relative URL>) but it actually works
+            const newSearchParams = new URLSearchParams(newURL.searchParams);
+            console.log(newURL.searchParams);
+            console.log(newSearchParams);
+
+            // Append query parameters
+            for (const [key, value] of queryParams) {
+                newSearchParams.set(key, value);
+            }
+
+            newURL.search = newSearchParams;
+            return newURL;
+        }
+
+        // Select all relative links on the page
+        const relativeLinks = document.querySelectorAll('a[href]:not([href^="http://"]):not([href^="https://"]):not([href^="\#"])');
+
+        // Append query parameters to each relative link
+        relativeLinks.forEach((link) => {
+            link.setAttribute("href", appendQueryParams(link.getAttribute("href")))
+        });
+    });
+    </script>
+
+</body>
+</html>
