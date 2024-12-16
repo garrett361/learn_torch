@@ -26,7 +26,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     try:
-        local_rank = os.environ["LOCAL_RANK"]
+        local_rank = int(os.environ["LOCAL_RANK"])
         device = torch.device(f"cuda:{local_rank}")
         torch.cuda.set_device(device)
         init_process_group("nccl")
@@ -37,13 +37,15 @@ if __name__ == "__main__":
                 nn.init.eye_(lin.weight)
                 fully_shard(lin)
         fully_shard(model)
+        if not local_rank:
+            print(f"{model=}")
 
         compiled_model = torch.compile(model)
         inputs = torch.randn(1, args.d_model, device=device)
-        outputs = compiled_model(inputs)
 
         outputs = compiled_model(inputs)
-        print(f"{outputs=}")
-        print(f"{outputs.shape=}")
+        if not local_rank:
+            print(f"{outputs=}")
+            print(f"{outputs-inputs=}")
     finally:
         destroy_process_group()

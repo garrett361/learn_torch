@@ -7,15 +7,26 @@ Extremely minimal script for testing various torch compile options
 """
 
 
+# class BasicModel(nn.Module):
+#     def __init__(self, d_model: int, device: torch.device) -> None:
+#         super().__init__()
+#         self.d_model = d_model
+#         self.lin0 = nn.Linear(d_model, d_model, bias=False, device=device)
+#         self.lin1 = nn.Linear(d_model, d_model, bias=False, device=device)
+#
+#     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+#         outputs = self.lin1(self.lin0(inputs).relu())
+#         return outputs
+
+
 class BasicModel(nn.Module):
     def __init__(self, d_model: int, device: torch.device) -> None:
         super().__init__()
         self.d_model = d_model
-        self.lin0 = nn.Linear(d_model, d_model, bias=False, device=device)
-        self.lin1 = nn.Linear(d_model, d_model, bias=False, device=device)
+        self.lin0 = nn.Linear(d_model, 2 * d_model, bias=False, device=device)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        outputs = self.lin1(self.lin0(inputs).relu())
+        outputs = self.lin0(inputs).relu()
         return outputs
 
 
