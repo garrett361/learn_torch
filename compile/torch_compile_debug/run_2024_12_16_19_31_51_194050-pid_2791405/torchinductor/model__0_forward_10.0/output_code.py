@@ -25,7 +25,7 @@ reinterpret_tensor = torch.ops.inductor._reinterpret_tensor
 async_compile = AsyncCompile()
 
 
-# kernel path: /tmp/torchinductor_goon/7w/c7wiehu377lflpy73mi7dhlb4pq3d65we35vznkdmsyyikohrgfh.py
+# kernel path: /tmp/torchinductor_goon/wk/cwkt4d5bhlzqh2nbuvgllpzqqn2myitdpdlbxdhocc27btzdyjna.py
 # Source Nodes: [outputs], Original ATen: [aten.relu, aten.threshold_backward]
 # outputs => relu
 triton_poi_fused_relu_threshold_backward_0 = async_compile.triton('triton_', '''
@@ -42,23 +42,23 @@ from torch._inductor.utils import instance_descriptor
 @triton_heuristics.pointwise(
     size_hints=[256], 
     filename=__file__,
-    triton_meta={'signature': {0: '*fp32', 1: '*i1', 2: 'i32'}, 'device': 0, 'device_type': 'cuda', 'constants': {}, 'configs': [AttrsDescriptor(divisible_by_16=(0, 1, 2), equal_to_1=(), ids_of_folded_args=(), divisible_by_8=(2,))]},
-    inductor_meta={'autotune_hints': set(), 'kernel_name': 'triton_poi_fused_relu_threshold_backward_0', 'mutated_arg_names': ['in_out_ptr0'], 'no_x_dim': False, 'backend_hash': '493e1fe457c358ce90acff64111ef5f4d47f6118d8ea0b6619574e4de66e314f'},
+    triton_meta={'signature': {0: '*fp32', 1: '*fp32', 2: '*i1', 3: 'i32'}, 'device': 1, 'device_type': 'cuda', 'constants': {}, 'configs': [AttrsDescriptor(divisible_by_16=(0, 1, 2, 3), equal_to_1=(), ids_of_folded_args=(), divisible_by_8=(3,))]},
+    inductor_meta={'autotune_hints': set(), 'kernel_name': 'triton_poi_fused_relu_threshold_backward_0', 'mutated_arg_names': [], 'no_x_dim': False, 'backend_hash': '493e1fe457c358ce90acff64111ef5f4d47f6118d8ea0b6619574e4de66e314f'},
     min_elem_per_thread=0
 )
 @triton.jit
-def triton_(in_out_ptr0, out_ptr0, xnumel, XBLOCK : tl.constexpr):
+def triton_(in_ptr0, out_ptr0, out_ptr1, xnumel, XBLOCK : tl.constexpr):
     xnumel = 256
     xoffset = tl.program_id(0) * XBLOCK
     xindex = xoffset + tl.arange(0, XBLOCK)[:]
     xmask = xindex < xnumel
     x0 = xindex
-    tmp0 = tl.load(in_out_ptr0 + (x0), xmask)
+    tmp0 = tl.load(in_ptr0 + (x0), xmask)
     tmp1 = triton_helpers.maximum(0, tmp0)
     tmp2 = 0.0
     tmp3 = tmp1 <= tmp2
-    tl.store(in_out_ptr0 + (x0), tmp1, xmask)
-    tl.store(out_ptr0 + (x0), tmp3, xmask)
+    tl.store(out_ptr0 + (x0), tmp1, xmask)
+    tl.store(out_ptr1 + (x0), tmp3, xmask)
 ''', device_str='cuda')
 
 import triton
@@ -71,30 +71,25 @@ async_compile.wait(globals())
 del async_compile
 
 def call(args):
-    primals_1, primals_2 = args
+    primals_1, = args
     args.clear()
-    assert_size_stride(primals_1, (256, 128), (128, 1))
-    assert_size_stride(primals_2, (1, 128), (128, 1))
-    with torch.cuda._DeviceGuard(0):
-        torch.cuda.set_device(0)
+    assert_size_stride(primals_1, (1, 256), (256, 1))
+    with torch.cuda._DeviceGuard(1):
+        torch.cuda.set_device(1)
         buf0 = empty_strided_cuda((1, 256), (256, 1), torch.float32)
-        # Source Nodes: [l__self___lin0], Original ATen: [aten.mm]
-        extern_kernels.mm(primals_2, reinterpret_tensor(primals_1, (128, 256), (1, 128), 0), out=buf0)
-        del primals_1
-        buf1 = buf0; del buf0  # reuse
-        buf2 = empty_strided_cuda((1, 256), (256, 1), torch.bool)
+        buf1 = empty_strided_cuda((1, 256), (256, 1), torch.bool)
         # Source Nodes: [outputs], Original ATen: [aten.relu, aten.threshold_backward]
-        stream0 = get_raw_stream(0)
-        triton_poi_fused_relu_threshold_backward_0.run(buf1, buf2, 256, grid=grid(256), stream=stream0)
-    return (buf1, primals_2, buf2, )
+        stream1 = get_raw_stream(1)
+        triton_poi_fused_relu_threshold_backward_0.run(primals_1, buf0, buf1, 256, grid=grid(256), stream=stream1)
+        del primals_1
+    return (buf0, buf1, )
 
 
 def benchmark_compiled_module(times=10, repeat=10):
     from torch._dynamo.testing import rand_strided
     from torch._inductor.utils import print_performance
-    primals_1 = rand_strided((256, 128), (128, 1), device='cuda:0', dtype=torch.float32)
-    primals_2 = rand_strided((1, 128), (128, 1), device='cuda:0', dtype=torch.float32)
-    fn = lambda: call([primals_1, primals_2])
+    primals_1 = rand_strided((1, 256), (256, 1), device='cuda:1', dtype=torch.float32)
+    fn = lambda: call([primals_1])
     return print_performance(fn, times=times, repeat=repeat)
 
 

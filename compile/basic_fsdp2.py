@@ -13,11 +13,15 @@ torchrun --nproc-per-node 2 basic_fsdp2.py
 """
 
 
-def get_simple_linear_model(d_model: int, device: torch.device) -> nn.Module:
-    model = nn.Sequential(
-        *(nn.Linear(d_model, d_model, bias=False, device=device) for _ in range(3))
-    )
-    return model
+class BasicModel(nn.Module):
+    def __init__(self, d_model: int, device: torch.device) -> None:
+        super().__init__()
+        self.d_model = d_model
+        self.lin0 = nn.Linear(d_model, 2 * d_model, bias=False, device=device)
+
+    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        outputs = self.lin0(inputs).relu()
+        return outputs
 
 
 if __name__ == "__main__":
@@ -31,7 +35,7 @@ if __name__ == "__main__":
         torch.cuda.set_device(device)
         init_process_group("nccl")
 
-        model = get_simple_linear_model(args.d_model, device)
+        model = BasicModel(args.d_model, device)
         for lin in model.modules():
             if isinstance(lin, nn.Linear):
                 nn.init.eye_(lin.weight)

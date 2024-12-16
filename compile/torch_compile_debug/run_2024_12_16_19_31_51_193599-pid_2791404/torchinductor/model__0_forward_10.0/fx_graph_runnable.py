@@ -38,22 +38,18 @@ class Repro(torch.nn.Module):
 
     
     
-    def forward(self, primals_1, primals_2):
-        permute = torch.ops.aten.permute.default(primals_1, [1, 0]);  primals_1 = None
-        mm = torch.ops.aten.mm.default(primals_2, permute);  permute = None
-        relu = torch.ops.aten.relu.default(mm);  mm = None
+    def forward(self, primals_1):
+        relu = torch.ops.aten.relu.default(primals_1);  primals_1 = None
         alias = torch.ops.aten.alias.default(relu)
         alias_1 = torch.ops.aten.alias.default(alias);  alias = None
         alias_2 = torch.ops.aten.alias.default(alias_1);  alias_1 = None
         alias_3 = torch.ops.aten.alias.default(alias_2);  alias_2 = None
         le = torch.ops.aten.le.Scalar(alias_3, 0);  alias_3 = None
-        return [relu, primals_2, le]
+        return [relu, le]
         
 def load_args(reader):
-    buf0 = reader.storage(None, 131072, device=device(type='cuda', index=0))
-    reader.tensor(buf0, (256, 128), requires_grad=True, is_leaf=True)  # primals_1
-    buf1 = reader.storage(None, 512, device=device(type='cuda', index=0))
-    reader.tensor(buf1, (1, 128), is_leaf=True)  # primals_2
+    buf0 = reader.storage(None, 1024, device=device(type='cuda', index=0))
+    reader.tensor(buf0, (1, 256), requires_grad=True)  # primals_1
 load_args._version = 0
 mod = Repro()
 if __name__ == '__main__':

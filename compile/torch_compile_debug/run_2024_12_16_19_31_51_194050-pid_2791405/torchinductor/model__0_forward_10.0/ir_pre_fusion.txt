@@ -1,0 +1,41 @@
+buf0: SchedulerNode(ComputedBuffer)
+buf0.writes = [MemoryDep('buf0', c0, {c0: 256})]
+buf0.unmet_dependencies = []
+buf0.met_dependencies = [MemoryDep('primals_1', c0, {c0: 256})]
+buf0.users = [NodeUser(node=SchedulerNode(name='buf1'), can_inplace=True, is_weak=False), NodeUser(node=OUTPUT, can_inplace=False, is_weak=False)]
+buf0.group.device = cuda:1
+buf0.group.iteration = (256, 1)
+buf0.sizes = ([256], [])
+class buf0_loop_body:
+    var_ranges = {z0: 256}
+    index0 = z0
+    def body(self, ops):
+        get_index = self.get_index('index0')
+        load = ops.load('primals_1', get_index)
+        relu = ops.relu(load)
+        get_index_1 = self.get_index('index0')
+        store = ops.store('buf0', get_index_1, relu, None)
+        return store
+
+
+buf1: SchedulerNode(ComputedBuffer)
+buf1.writes = [MemoryDep('buf1', c0, {c0: 256})]
+buf1.unmet_dependencies = [MemoryDep('buf0', c0, {c0: 256})]
+buf1.met_dependencies = []
+buf1.users = [NodeUser(node=OUTPUT, can_inplace=False, is_weak=False)]
+buf1.group.device = cuda:1
+buf1.group.iteration = (256, 1)
+buf1.sizes = ([256], [])
+class buf1_loop_body:
+    var_ranges = {z0: 256}
+    index0 = z0
+    def body(self, ops):
+        get_index = self.get_index('index0')
+        load = ops.load('buf0', get_index)
+        constant = ops.constant(0.0, torch.float32)
+        le = ops.le(load, constant)
+        get_index_1 = self.get_index('index0')
+        store = ops.store('buf1', get_index_1, le, None)
+        return store
+
+
