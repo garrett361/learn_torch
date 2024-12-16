@@ -48,8 +48,8 @@ class Repro(torch.nn.Module):
         return [relu, le]
         
 def load_args(reader):
-    buf0 = reader.storage(None, 1024, device=device(type='cuda', index=1))
-    reader.tensor(buf0, (1, 256), requires_grad=True)  # primals_1
+    buf0 = reader.storage(None, 512, device=device(type='cuda', index=0))
+    reader.tensor(buf0, (1, 128), requires_grad=True)  # primals_1
 load_args._version = 0
 mod = Repro()
 if __name__ == '__main__':
