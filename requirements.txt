@@ -1,0 +1,11 @@
+torch==2.3.1
+einops
+tlparse
+numpy
+ipython
+ruff
+ruff-lsp
+basedpyright
+debugpy
+pytest
+-e dtest
