@@ -1,38 +1,32 @@
-import os
-from functools import cache
+from typing import Any, Callable
 
-import torch
-
-
-@cache
-def get_rank() -> int:
-    return int(os.getenv("RANK", 0))
+from torch.fx import GraphModule
+from torch._functorch.aot_autograd import aot_module_simplified
 
 
-@cache
-def get_local_rank() -> int:
-    return int(os.getenv("LOCAL_RANK", 0))
+class PrintGMBackend:
+    """
+    Simple backend for printing generated graph modules and tracking the number of them created.
+    Based on: https://colab.research.google.com/drive/1Zh-Uo3TcTHD_MODELyYJF-LLo5rjlHVMtqvMdf?usp=sharing#scrollTo=UklMVs56u9j7
 
+    """
 
-@cache
-def get_world_size() -> int:
-    return int(os.getenv("WORLD_SIZE", 1))
+    def __init__(self) -> None:
+        self._gm_dict: dict[int, GraphModule] = {}
 
+    def __call__(self, gm: GraphModule, sample_inputs: Any) -> Callable:
+        print("Printing graph:")
+        gm.print_readable()
+        print(f"{sample_inputs=}")
+        self._gm_dict[self.n_gms] = gm
+        return gm.forward
 
-@cache
-def get_device_type() -> str:
-    if torch.cuda.is_available():
-        return "cuda"
-    return "cpu"
+    def get_aot_compiler(self) -> Callable:
+        return lambda gm, sample_inputs: aot_module_simplified(gm, sample_inputs, self)
 
+    def __getitem__(self, idx: int) -> GraphModule:
+        return self._gm_dict[idx]
 
-@cache
-def get_device() -> torch.device:
-    return torch.device(f"{get_device_type()}:{get_local_rank()}")
-
-
-@cache
-def get_comms_backend() -> str:
-    if torch.cuda.is_available():
-        return "nccl"
-    return "gloo"
+    @property
+    def n_gms(self) -> int:
+        return len(self._gm_dict)

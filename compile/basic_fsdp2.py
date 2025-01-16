@@ -35,21 +35,21 @@ if __name__ == "__main__":
         torch.cuda.set_device(device)
         init_process_group("nccl")
 
-        model = BasicModel(args.d_model, device)
-        for lin in model.modules():
-            if isinstance(lin, nn.Linear):
-                nn.init.eye_(lin.weight)
-                fully_shard(lin)
+        model = nn.Sequential(*(BasicModel(args.d_model, device) for _ in range(3)))
+        for module in model.modules():
+            if isinstance(module, BasicModel):
+                fully_shard(module)
         fully_shard(model)
         if not local_rank:
             print(f"{model=}")
+            for name, param in model.named_parameters():
+                print(f"{name=}, {param=}")
 
         compiled_model = torch.compile(model)
         inputs = torch.randn(1, args.d_model, device=device)
 
         outputs = compiled_model(inputs)
-        if not local_rank:
-            print(f"{outputs=}")
-            print(f"{outputs-inputs=}")
+        print(f"{local_rank=}, {outputs=}")
+        outputs.pow(2).mean().backward()
     finally:
         destroy_process_group()

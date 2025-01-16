@@ -43,3 +43,5 @@ if __name__ == "__main__":
     outputs = compiled_model(inputs)
     print(f"{outputs=}")
     print(f"{outputs.shape=}")
+
+    outputs.pow(2).mean().backward()
