@@ -1,0 +1,7 @@
+[project]
+name="learn torch"
+
+[tool.ruff]
+line-length = 100
+
+
