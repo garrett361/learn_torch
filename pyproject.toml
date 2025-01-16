@@ -1,7 +1,9 @@
 [project]
-name="learn torch"
+name="learn_torch"
+version="0.0.0"
+
+[tool.setuptools]
+py-modules = ["learn_torch"]
 
 [tool.ruff]
 line-length = 100
-
-
