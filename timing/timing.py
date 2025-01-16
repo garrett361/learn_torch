@@ -1,7 +1,7 @@
 import torch
 
 
-class CudaTimer:
+class CUDATimer:
     def __init__(self) -> None:
         self._start_events: list[torch.cuda.Event] = []
         self._end_events: list[torch.cuda.Event] = []
