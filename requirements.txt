@@ -9,3 +9,4 @@ basedpyright
 debugpy
 pytest
 -e dtest
+tabulate
