@@ -1,6 +1,6 @@
 import torch
 from transformers import AutoModelForCausalLM, AutoConfig
-from memory import CUDAMemContext
+from learn_torch.memory.memory import CUDAMemContext
 
 if __name__ == "__main__":
     model_name = "ibm-fms/Bamba-9B"

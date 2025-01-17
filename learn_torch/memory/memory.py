@@ -6,7 +6,7 @@ class CUDAMemContext:
     def __init__(
         self,
         use_GiB: bool = True,
-        filter_patterns: tuple[str, ...] = ("allocated_bytes.all", "reserved_bytes.all"),
+        filter_patterns: tuple[str, ...] = ("allocated_bytes.all",),
         mem_only: bool = True,
     ) -> None:
         # Ensure CUDA libraries are loaded:
