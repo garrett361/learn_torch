@@ -7,14 +7,21 @@ if __name__ == "__main__":
     seq_len = 4096
     batch_size = 1
     numel = vocab_size * seq_len
-    with CUDAMemContext() as input_mem:
+    mem_context_kwargs = {
+        "filter_patterns": (
+            "allocated_bytes.all.peak",
+            "allocated_bytes.all.current",
+        )
+    }
+
+    with CUDAMemContext(**mem_context_kwargs) as input_mem:
         logits = torch.randn(
             batch_size, numel, device="cuda", dtype=torch.bfloat16, requires_grad=True
         )
         labels = torch.randint(vocab_size, size=(batch_size,), device="cuda")
-    with CUDAMemContext() as loss_mem:
+    with CUDAMemContext(**mem_context_kwargs) as loss_mem:
         loss = F.cross_entropy(logits, labels)
-    with CUDAMemContext() as back_mem:
+    with CUDAMemContext(**mem_context_kwargs) as back_mem:
         loss.backward()
 
     prefix = ".all."
