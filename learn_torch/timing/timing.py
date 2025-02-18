@@ -6,12 +6,13 @@ class CUDATimer:
         self._start_events: list[torch.cuda.Event] = []
         self._end_events: list[torch.cuda.Event] = []
 
-    def __enter__(self) -> None:
+    def __enter__(self) -> "CUDATimer":
         start = torch.cuda.Event(enable_timing=True)
         stop = torch.cuda.Event(enable_timing=True)
         start.record()
         self._start_events.append(start)
         self._end_events.append(stop)
+        return self
 
     def __exit__(self, *args, **kwargs) -> None:
         self._end_events[-1].record()
