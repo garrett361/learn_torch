@@ -8,7 +8,7 @@ class CUDATimer:
 
     def __enter__(self) -> "CUDATimer":
         start = torch.cuda.Event(enable_timing=True)
-        stop = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
         start.record()
         self._start_events.append(start)
         self._end_events.append(stop)
