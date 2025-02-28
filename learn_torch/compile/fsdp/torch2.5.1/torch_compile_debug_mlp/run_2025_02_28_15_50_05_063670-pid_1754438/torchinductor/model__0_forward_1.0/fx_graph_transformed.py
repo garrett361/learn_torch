@@ -31,7 +31,7 @@ class GraphModule(torch.nn.Module):
         as_strided_1: "bf16[16, 16]" = torch.ops.aten.as_strided.default(view_3, [16, 16], [16, 1], 0);  view_3 = None
         set_ = torch.ops.fsdp.set_.default(primals_3, as_strided_1);  as_strided_1 = set_ = None
         
-         # File: /gpfs/users/goon/github/garrett361/learn_torch/learn_torch/compile/fsdp/torch2.5.1/mlp.py:99 in forward, code: outputs = self.lin0(inputs).relu()
+         # File: /gpfs/users/goon/github/garrett361/learn_torch/learn_torch/compile/fsdp/torch2.5.1/mlp.py:97 in forward, code: return self.lin0(inputs).relu()
         permute: "bf16[16, 16]" = torch.ops.aten.permute.default(primals_3, [1, 0]);  primals_3 = None
         mm: "bf16[1, 16]" = torch.ops.aten.mm.default(primals_1, permute);  permute = None
         relu: "bf16[1, 16]" = torch.ops.aten.relu.default(mm);  mm = None
@@ -70,7 +70,7 @@ class GraphModule(torch.nn.Module):
         as_strided_3: "bf16[16, 16]" = torch.ops.aten.as_strided.default(view_8, [16, 16], [16, 1], 0);  view_8 = None
         set__1 = torch.ops.fsdp.set_.default(primals_6, as_strided_3);  as_strided_3 = set__1 = None
         
-         # File: /gpfs/users/goon/github/garrett361/learn_torch/learn_torch/compile/fsdp/torch2.5.1/mlp.py:99 in forward, code: outputs = self.lin0(inputs).relu()
+         # File: /gpfs/users/goon/github/garrett361/learn_torch/learn_torch/compile/fsdp/torch2.5.1/mlp.py:97 in forward, code: return self.lin0(inputs).relu()
         permute_1: "bf16[16, 16]" = torch.ops.aten.permute.default(primals_6, [1, 0])
         mm_1: "bf16[1, 16]" = torch.ops.aten.mm.default(relu, permute_1);  permute_1 = None
         relu_1: "bf16[1, 16]" = torch.ops.aten.relu.default(mm_1);  mm_1 = None
@@ -109,7 +109,7 @@ class GraphModule(torch.nn.Module):
         as_strided_5: "bf16[16, 16]" = torch.ops.aten.as_strided.default(view_13, [16, 16], [16, 1], 0);  view_13 = None
         set__2 = torch.ops.fsdp.set_.default(primals_8, as_strided_5);  as_strided_5 = set__2 = None
         
-         # File: /gpfs/users/goon/github/garrett361/learn_torch/learn_torch/compile/fsdp/torch2.5.1/mlp.py:99 in forward, code: outputs = self.lin0(inputs).relu()
+         # File: /gpfs/users/goon/github/garrett361/learn_torch/learn_torch/compile/fsdp/torch2.5.1/mlp.py:97 in forward, code: return self.lin0(inputs).relu()
         permute_2: "bf16[16, 16]" = torch.ops.aten.permute.default(primals_8, [1, 0])
         mm_2: "bf16[1, 16]" = torch.ops.aten.mm.default(relu_1, permute_2);  permute_2 = None
         relu_2: "bf16[1, 16]" = torch.ops.aten.relu.default(mm_2);  mm_2 = None
@@ -117,7 +117,7 @@ class GraphModule(torch.nn.Module):
          # File: /gpfs/users/goon/.pyenv/versions/3.12.8/envs/torch-2.5.1/lib/python3.12/site-packages/torch/distributed/_composable/fsdp/_fsdp_param.py:733 in free_storage, code: storage.resize_(0)
         resize_storage_bytes__2 = torch.ops.inductor.resize_storage_bytes_.default(empty_2, 0);  empty_2 = resize_storage_bytes__2 = None
         
-         # File: /gpfs/users/goon/github/garrett361/learn_torch/learn_torch/compile/fsdp/torch2.5.1/mlp.py:99 in forward, code: outputs = self.lin0(inputs).relu()
+         # File: /gpfs/users/goon/github/garrett361/learn_torch/learn_torch/compile/fsdp/torch2.5.1/mlp.py:97 in forward, code: return self.lin0(inputs).relu()
         le: "b8[1, 16]" = torch.ops.aten.le.Scalar(relu_2, 0)
         return (relu_2, primals_1, primals_6, primals_8, relu, relu_1, le)
         

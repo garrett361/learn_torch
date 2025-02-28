@@ -94,8 +94,7 @@ class MinimalBlock(nn.Module):
         self.lin0 = nn.Linear(d_model, d_model, bias=False, device=device, dtype=dtype)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        outputs = self.lin0(inputs).relu()
-        return outputs
+        return self.lin0(inputs).relu()
 
 
 def get_fsdp_model(d_model: int, device: torch.device, dtype: torch.dtype) -> nn.Module:

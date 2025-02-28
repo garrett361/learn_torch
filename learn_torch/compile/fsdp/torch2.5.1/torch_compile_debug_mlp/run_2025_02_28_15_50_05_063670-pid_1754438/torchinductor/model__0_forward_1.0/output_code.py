@@ -64,9 +64,9 @@ def triton_(in_ptr0, out_ptr0, xnumel, XBLOCK : tl.constexpr):
 
 
 # kernel path: /tmp/torchinductor_goon/qb/cqbk4cocsibgylvv4iqvd3l35imn364gq4x7ror7btkzfrfzbbsq.py
-# Topologically Sorted Source Nodes: [outputs], Original ATen: [aten.relu]
+# Topologically Sorted Source Nodes: [output], Original ATen: [aten.relu]
 # Source node to ATen node mapping:
-#   outputs => relu
+#   output => relu
 # Graph fragment:
 #   %relu : [num_users=2] = call_function[target=torch.ops.aten.relu.default](args = (%mm,), kwargs = {})
 triton_poi_fused_relu_1 = async_compile.triton('triton_', '''
@@ -100,9 +100,9 @@ def triton_(in_out_ptr0, xnumel, XBLOCK : tl.constexpr):
 
 
 # kernel path: /tmp/torchinductor_goon/te/ctecp5vdyj2gw5scwgrgesk2qrgrmdkiu26vyl3oulpuzjgftmmi.py
-# Topologically Sorted Source Nodes: [outputs_2], Original ATen: [aten.relu, aten.threshold_backward]
+# Topologically Sorted Source Nodes: [output_2], Original ATen: [aten.relu, aten.threshold_backward]
 # Source node to ATen node mapping:
-#   outputs_2 => relu_2
+#   output_2 => relu_2
 # Graph fragment:
 #   %relu_2 : [num_users=2] = call_function[target=torch.ops.aten.relu.default](args = (%mm_2,), kwargs = {})
 #   %le : [num_users=1] = call_function[target=torch.ops.aten.le.Scalar](args = (%relu_2, 0), kwargs = {})
@@ -198,7 +198,7 @@ def call(args):
         extern_kernels.mm(primals_1, reinterpret_tensor(primals_3, (16, 16), (1, 16), 0), out=buf15)
         del primals_3
         buf16 = buf15; del buf15  # reuse
-        # Topologically Sorted Source Nodes: [outputs], Original ATen: [aten.relu]
+        # Topologically Sorted Source Nodes: [output], Original ATen: [aten.relu]
         triton_poi_fused_relu_1.run(buf16, 16, grid=grid(16), stream=stream0)
         inductor_ops.resize_storage_bytes_(buf8, 0)
         # Topologically Sorted Source Nodes: [res_1], Original ATen: [_c10d_functional.wait_tensor]
@@ -222,7 +222,7 @@ def call(args):
         # Topologically Sorted Source Nodes: [linear_1], Original ATen: [aten.mm]
         extern_kernels.mm(buf16, reinterpret_tensor(primals_6, (16, 16), (1, 16), 0), out=buf33)
         buf34 = buf33; del buf33  # reuse
-        # Topologically Sorted Source Nodes: [outputs_1], Original ATen: [aten.relu]
+        # Topologically Sorted Source Nodes: [output_1], Original ATen: [aten.relu]
         triton_poi_fused_relu_1.run(buf34, 16, grid=grid(16), stream=stream0)
         inductor_ops.resize_storage_bytes_(buf26, 0)
         # Topologically Sorted Source Nodes: [res_2], Original ATen: [_c10d_functional.wait_tensor]
@@ -238,7 +238,7 @@ def call(args):
         extern_kernels.mm(buf34, reinterpret_tensor(primals_8, (16, 16), (1, 16), 0), out=buf51)
         buf52 = buf51; del buf51  # reuse
         buf54 = empty_strided_cuda((1, 16), (16, 1), torch.bool)
-        # Topologically Sorted Source Nodes: [outputs_2], Original ATen: [aten.relu, aten.threshold_backward]
+        # Topologically Sorted Source Nodes: [output_2], Original ATen: [aten.relu, aten.threshold_backward]
         triton_poi_fused_relu_threshold_backward_2.run(buf52, buf54, 16, grid=grid(16), stream=stream0)
         inductor_ops.resize_storage_bytes_(buf44, 0)
     return (buf52, primals_1, primals_6, primals_8, buf16, buf34, buf54, )

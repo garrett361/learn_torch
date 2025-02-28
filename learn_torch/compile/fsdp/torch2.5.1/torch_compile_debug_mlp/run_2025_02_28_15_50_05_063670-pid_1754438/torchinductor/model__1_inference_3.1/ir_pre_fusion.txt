@@ -36,15 +36,15 @@ op1_op2_op3_op4.outputs = [
     buf3.layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
     buf3.users = [NodeUser(node=ExternKernelSchedulerNode(name='op4'), can_inplace=False, is_weak=False)]
     buf4: _CollectiveKernel
-    buf4.layout = <torch._inductor.ir.NoneLayout object at 0x14a3418a0140>
+    buf4.layout = <torch._inductor.ir.NoneLayout object at 0x150e13a4b740>
     buf4.aliases = ['buf2', 'buf3']
     buf4.users = [NodeUser(node=ExternKernelSchedulerNode(name='op4'), can_inplace=False, is_weak=False)]
     buf5: MutationOutput
-    buf5.layout = <torch._inductor.ir.NoneLayout object at 0x14a34188c050>
+    buf5.layout = <torch._inductor.ir.NoneLayout object at 0x150e1117d370>
     buf5.mutations = ['buf2']
     buf5.users = []
     buf6: MutationOutput
-    buf6.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ac88230>
+    buf6.layout = <torch._inductor.ir.NoneLayout object at 0x150e1117e0f0>
     buf6.mutations = ['buf3']
     buf6.users = [NodeUser(node=ExternKernelSchedulerNode(name='op5'), can_inplace=False, is_weak=False)]
 ]
@@ -66,21 +66,21 @@ op5_op7_op8.met_dependencies =
         WeakDep(name='buf11', mutating_buf='buf13')]
 op5_op7_op8.outputs = [
     buf7: _WaitKernel
-    buf7.layout = <torch._inductor.ir.NoneLayout object at 0x14a3416311f0>
+    buf7.layout = <torch._inductor.ir.NoneLayout object at 0x150e10fbcfe0>
     buf7.users = []
     buf8: MutationOutput
-    buf8.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ac6baa0>
+    buf8.layout = <torch._inductor.ir.NoneLayout object at 0x150e13d1ca70>
     buf8.mutations = ['buf3']
     buf8.users = [NodeUser(node=ExternKernelSchedulerNode(name='op7'), can_inplace=False, is_weak=False)]
     buf10: FallbackKernel
-    buf10.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ac7be90>
+    buf10.layout = <torch._inductor.ir.NoneLayout object at 0x150e110fa0f0>
     buf10.aliases = ['buf9']
     buf10.users = [
         NodeUser(node=ExternKernelSchedulerNode(name='op7'), can_inplace=False, is_weak=False),
         NodeUser(node=ExternKernelSchedulerNode(name='op8'), can_inplace=False, is_weak=False),
     ]
     buf11: MutationOutput
-    buf11.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ab161e0>
+    buf11.layout = <torch._inductor.ir.NoneLayout object at 0x150e10f5dfd0>
     buf11.mutations = ['buf9']
     buf11.users = [NodeUser(node=ExternKernelSchedulerNode(name='op8'), can_inplace=False, is_weak=False)]
     buf12: SetSourceTensorKernel
@@ -91,14 +91,14 @@ op5_op7_op8.outputs = [
         NodeUser(node=ExternKernelSchedulerNode(name='op8'), can_inplace=False, is_weak=False),
     ]
     buf13: MutationOutput
-    buf13.layout = <torch._inductor.ir.NoneLayout object at 0x14a3418a1b50>
+    buf13.layout = <torch._inductor.ir.NoneLayout object at 0x150e110fb740>
     buf13.mutations = ['arg3_1']
     buf13.users = [
         NodeUser(node=ExternKernelSchedulerNode(name='op10'), can_inplace=False, is_weak=False),
         NodeUser(node=OUTPUT, can_inplace=False, is_weak=False),
     ]
     buf14: MutationOutput
-    buf14.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ab17aa0>
+    buf14.layout = <torch._inductor.ir.NoneLayout object at 0x150e10ff09b0>
     buf14.mutations = ['buf9']
     buf14.users = [NodeUser(node=ExternKernelSchedulerNode(name='op47'), can_inplace=False, is_weak=True)]
 ]
@@ -295,15 +295,15 @@ op13_op14_op15_op16.outputs = [
     buf21.layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
     buf21.users = [NodeUser(node=ExternKernelSchedulerNode(name='op16'), can_inplace=False, is_weak=False)]
     buf22: _CollectiveKernel
-    buf22.layout = <torch._inductor.ir.NoneLayout object at 0x14a3418a1d30>
+    buf22.layout = <torch._inductor.ir.NoneLayout object at 0x150e13d16630>
     buf22.aliases = ['buf20', 'buf21']
     buf22.users = [NodeUser(node=ExternKernelSchedulerNode(name='op16'), can_inplace=False, is_weak=False)]
     buf23: MutationOutput
-    buf23.layout = <torch._inductor.ir.NoneLayout object at 0x14a33acec470>
+    buf23.layout = <torch._inductor.ir.NoneLayout object at 0x150e13de8920>
     buf23.mutations = ['buf20']
     buf23.users = []
     buf24: MutationOutput
-    buf24.layout = <torch._inductor.ir.NoneLayout object at 0x14a33acef110>
+    buf24.layout = <torch._inductor.ir.NoneLayout object at 0x150e13cead20>
     buf24.mutations = ['buf21']
     buf24.users = [NodeUser(node=ExternKernelSchedulerNode(name='op17'), can_inplace=False, is_weak=False)]
 ]
@@ -325,21 +325,21 @@ op17_op19_op20.met_dependencies =
         WeakDep(name='buf29', mutating_buf='buf31')]
 op17_op19_op20.outputs = [
     buf25: _WaitKernel
-    buf25.layout = <torch._inductor.ir.NoneLayout object at 0x14a33acefd70>
+    buf25.layout = <torch._inductor.ir.NoneLayout object at 0x150e10f5e840>
     buf25.users = []
     buf26: MutationOutput
-    buf26.layout = <torch._inductor.ir.NoneLayout object at 0x14a3418a1700>
+    buf26.layout = <torch._inductor.ir.NoneLayout object at 0x150e13d16b70>
     buf26.mutations = ['buf21']
     buf26.users = [NodeUser(node=ExternKernelSchedulerNode(name='op19'), can_inplace=False, is_weak=False)]
     buf28: FallbackKernel
-    buf28.layout = <torch._inductor.ir.NoneLayout object at 0x14a3416c0980>
+    buf28.layout = <torch._inductor.ir.NoneLayout object at 0x150e1393ddc0>
     buf28.aliases = ['buf27']
     buf28.users = [
         NodeUser(node=ExternKernelSchedulerNode(name='op19'), can_inplace=False, is_weak=False),
         NodeUser(node=ExternKernelSchedulerNode(name='op20'), can_inplace=False, is_weak=False),
     ]
     buf29: MutationOutput
-    buf29.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ab3e6f0>
+    buf29.layout = <torch._inductor.ir.NoneLayout object at 0x150e10f725a0>
     buf29.mutations = ['buf27']
     buf29.users = [NodeUser(node=ExternKernelSchedulerNode(name='op20'), can_inplace=False, is_weak=False)]
     buf30: SetSourceTensorKernel
@@ -350,14 +350,14 @@ op17_op19_op20.outputs = [
         NodeUser(node=ExternKernelSchedulerNode(name='op20'), can_inplace=False, is_weak=False),
     ]
     buf31: MutationOutput
-    buf31.layout = <torch._inductor.ir.NoneLayout object at 0x14a341632d50>
+    buf31.layout = <torch._inductor.ir.NoneLayout object at 0x150e13d17e60>
     buf31.mutations = ['arg2_1']
     buf31.users = [
         NodeUser(node=ExternKernelSchedulerNode(name='op22'), can_inplace=False, is_weak=False),
         NodeUser(node=OUTPUT, can_inplace=False, is_weak=False),
     ]
     buf32: MutationOutput
-    buf32.layout = <torch._inductor.ir.NoneLayout object at 0x14a33acee9f0>
+    buf32.layout = <torch._inductor.ir.NoneLayout object at 0x150e10f72ba0>
     buf32.mutations = ['buf27']
     buf32.users = [NodeUser(node=ExternKernelSchedulerNode(name='op41'), can_inplace=False, is_weak=True)]
 ]
@@ -555,15 +555,15 @@ op25_op26_op27_op28.outputs = [
     buf39.layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
     buf39.users = [NodeUser(node=ExternKernelSchedulerNode(name='op28'), can_inplace=False, is_weak=False)]
     buf40: _CollectiveKernel
-    buf40.layout = <torch._inductor.ir.NoneLayout object at 0x14a3416d5010>
+    buf40.layout = <torch._inductor.ir.NoneLayout object at 0x150e110d8e30>
     buf40.aliases = ['buf38', 'buf39']
     buf40.users = [NodeUser(node=ExternKernelSchedulerNode(name='op28'), can_inplace=False, is_weak=False)]
     buf41: MutationOutput
-    buf41.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ab3d9d0>
+    buf41.layout = <torch._inductor.ir.NoneLayout object at 0x150e110fb590>
     buf41.mutations = ['buf38']
     buf41.users = []
     buf42: MutationOutput
-    buf42.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ab3daf0>
+    buf42.layout = <torch._inductor.ir.NoneLayout object at 0x150e10ff0470>
     buf42.mutations = ['buf39']
     buf42.users = [NodeUser(node=ExternKernelSchedulerNode(name='op29'), can_inplace=False, is_weak=False)]
 ]
@@ -585,21 +585,21 @@ op29_op31_op32.met_dependencies =
         WeakDep(name='buf47', mutating_buf='buf49')]
 op29_op31_op32.outputs = [
     buf43: _WaitKernel
-    buf43.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ac36120>
+    buf43.layout = <torch._inductor.ir.NoneLayout object at 0x150e10ff05c0>
     buf43.users = []
     buf44: MutationOutput
-    buf44.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ab3e990>
+    buf44.layout = <torch._inductor.ir.NoneLayout object at 0x150e110d8a70>
     buf44.mutations = ['buf39']
     buf44.users = [NodeUser(node=ExternKernelSchedulerNode(name='op31'), can_inplace=False, is_weak=False)]
     buf46: FallbackKernel
-    buf46.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ab157c0>
+    buf46.layout = <torch._inductor.ir.NoneLayout object at 0x150e110f8350>
     buf46.aliases = ['buf45']
     buf46.users = [
         NodeUser(node=ExternKernelSchedulerNode(name='op31'), can_inplace=False, is_weak=False),
         NodeUser(node=ExternKernelSchedulerNode(name='op32'), can_inplace=False, is_weak=False),
     ]
     buf47: MutationOutput
-    buf47.layout = <torch._inductor.ir.NoneLayout object at 0x14a33aced550>
+    buf47.layout = <torch._inductor.ir.NoneLayout object at 0x150e10e186b0>
     buf47.mutations = ['buf45']
     buf47.users = [NodeUser(node=ExternKernelSchedulerNode(name='op32'), can_inplace=False, is_weak=False)]
     buf48: SetSourceTensorKernel
@@ -610,11 +610,11 @@ op29_op31_op32.outputs = [
         NodeUser(node=ExternKernelSchedulerNode(name='op32'), can_inplace=False, is_weak=False),
     ]
     buf49: MutationOutput
-    buf49.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ab3e570>
+    buf49.layout = <torch._inductor.ir.NoneLayout object at 0x150e10e1bb90>
     buf49.mutations = ['arg7_1']
     buf49.users = [NodeUser(node=OUTPUT, can_inplace=False, is_weak=False)]
     buf50: MutationOutput
-    buf50.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ab8e870>
+    buf50.layout = <torch._inductor.ir.NoneLayout object at 0x150e10e1a3c0>
     buf50.mutations = ['buf45']
     buf50.users = [NodeUser(node=ExternKernelSchedulerNode(name='op35'), can_inplace=False, is_weak=True)]
 ]
@@ -752,7 +752,7 @@ op35.unmet_dependencies = [StarDep(name='buf36', mode=None), WeakDep(name='buf50
 op35.met_dependencies = []
 op35.outputs = [
     buf53: ResizeStorageBytes
-    buf53.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ab8dbb0>
+    buf53.layout = <torch._inductor.ir.NoneLayout object at 0x150e10e1bfb0>
     buf53.mutations = ['buf36']
     buf53.users = []
 ]
@@ -787,11 +787,11 @@ op37_op39.unmet_dependencies =
 op37_op39.met_dependencies = []
 op37_op39.outputs = [
     buf55: FallbackKernel
-    buf55.layout = <torch._inductor.ir.NoneLayout object at 0x14a341a0dd90>
+    buf55.layout = <torch._inductor.ir.NoneLayout object at 0x150e10f727e0>
     buf55.aliases = ['buf54']
     buf55.users = [NodeUser(node=ExternKernelSchedulerNode(name='op37'), can_inplace=False, is_weak=False)]
     buf56: MutationOutput
-    buf56.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ab8f350>
+    buf56.layout = <torch._inductor.ir.NoneLayout object at 0x150e10fbcfb0>
     buf56.mutations = ['buf54']
     buf56.users = [
         NodeUser(node=ExternKernelSchedulerNode(name='op39'), can_inplace=False, is_weak=False),
@@ -809,10 +809,10 @@ op40.unmet_dependencies = [StarDep(name='buf56', mode=None), StarDep(name='buf58
 op40.met_dependencies = []
 op40.outputs = [
     buf59: _WaitKernel
-    buf59.layout = <torch._inductor.ir.NoneLayout object at 0x14a341970ef0>
+    buf59.layout = <torch._inductor.ir.NoneLayout object at 0x150e13919910>
     buf59.users = []
     buf60: MutationOutput
-    buf60.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ab8fec0>
+    buf60.layout = <torch._inductor.ir.NoneLayout object at 0x150e10ff53a0>
     buf60.mutations = ['buf58']
     buf60.users = [NodeUser(node=OUTPUT, can_inplace=False, is_weak=False)]
 ]
@@ -824,7 +824,7 @@ op41.unmet_dependencies = [StarDep(name='buf18', mode=None), WeakDep(name='buf32
 op41.met_dependencies = []
 op41.outputs = [
     buf61: ResizeStorageBytes
-    buf61.layout = <torch._inductor.ir.NoneLayout object at 0x14a33abb01d0>
+    buf61.layout = <torch._inductor.ir.NoneLayout object at 0x150e10ff57c0>
     buf61.mutations = ['buf18']
     buf61.users = []
 ]
@@ -858,11 +858,11 @@ op43_op45.unmet_dependencies =
 op43_op45.met_dependencies = []
 op43_op45.outputs = [
     buf63: FallbackKernel
-    buf63.layout = <torch._inductor.ir.NoneLayout object at 0x14a33acef650>
+    buf63.layout = <torch._inductor.ir.NoneLayout object at 0x150e10f5e990>
     buf63.aliases = ['buf62']
     buf63.users = [NodeUser(node=ExternKernelSchedulerNode(name='op43'), can_inplace=False, is_weak=False)]
     buf64: MutationOutput
-    buf64.layout = <torch._inductor.ir.NoneLayout object at 0x14a33abb0dd0>
+    buf64.layout = <torch._inductor.ir.NoneLayout object at 0x150e10ff6390>
     buf64.mutations = ['buf62']
     buf64.users = [
         NodeUser(node=ExternKernelSchedulerNode(name='op45'), can_inplace=False, is_weak=False),
@@ -880,10 +880,10 @@ op46.unmet_dependencies = [StarDep(name='buf64', mode=None), StarDep(name='buf66
 op46.met_dependencies = []
 op46.outputs = [
     buf67: _WaitKernel
-    buf67.layout = <torch._inductor.ir.NoneLayout object at 0x14a34188c8c0>
+    buf67.layout = <torch._inductor.ir.NoneLayout object at 0x150e110da1b0>
     buf67.users = []
     buf68: MutationOutput
-    buf68.layout = <torch._inductor.ir.NoneLayout object at 0x14a33acefb30>
+    buf68.layout = <torch._inductor.ir.NoneLayout object at 0x150e10ff7260>
     buf68.mutations = ['buf66']
     buf68.users = [NodeUser(node=OUTPUT, can_inplace=False, is_weak=False)]
 ]
@@ -895,7 +895,7 @@ op47.unmet_dependencies = [StarDep(name='buf0', mode=None), WeakDep(name='buf14'
 op47.met_dependencies = []
 op47.outputs = [
     buf69: ResizeStorageBytes
-    buf69.layout = <torch._inductor.ir.NoneLayout object at 0x14a33acb1ac0>
+    buf69.layout = <torch._inductor.ir.NoneLayout object at 0x150e10ff72c0>
     buf69.mutations = ['buf0']
     buf69.users = []
 ]
@@ -929,11 +929,11 @@ op49_op51.unmet_dependencies =
 op49_op51.met_dependencies = []
 op49_op51.outputs = [
     buf71: FallbackKernel
-    buf71.layout = <torch._inductor.ir.NoneLayout object at 0x14a3418a0fe0>
+    buf71.layout = <torch._inductor.ir.NoneLayout object at 0x150e110fa8a0>
     buf71.aliases = ['buf70']
     buf71.users = [NodeUser(node=ExternKernelSchedulerNode(name='op49'), can_inplace=False, is_weak=False)]
     buf72: MutationOutput
-    buf72.layout = <torch._inductor.ir.NoneLayout object at 0x14a33ab8f590>
+    buf72.layout = <torch._inductor.ir.NoneLayout object at 0x150e10ff76e0>
     buf72.mutations = ['buf70']
     buf72.users = [
         NodeUser(node=ExternKernelSchedulerNode(name='op51'), can_inplace=False, is_weak=False),
@@ -951,10 +951,10 @@ op52.unmet_dependencies = [StarDep(name='buf72', mode=None), StarDep(name='buf74
 op52.met_dependencies = []
 op52.outputs = [
     buf75: _WaitKernel
-    buf75.layout = <torch._inductor.ir.NoneLayout object at 0x14a33abb2090>
+    buf75.layout = <torch._inductor.ir.NoneLayout object at 0x150e110da1e0>
     buf75.users = []
     buf76: MutationOutput
-    buf76.layout = <torch._inductor.ir.NoneLayout object at 0x14a33abb17c0>
+    buf76.layout = <torch._inductor.ir.NoneLayout object at 0x150e10ff78c0>
     buf76.mutations = ['buf74']
     buf76.users = [NodeUser(node=OUTPUT, can_inplace=False, is_weak=False)]
 ]
