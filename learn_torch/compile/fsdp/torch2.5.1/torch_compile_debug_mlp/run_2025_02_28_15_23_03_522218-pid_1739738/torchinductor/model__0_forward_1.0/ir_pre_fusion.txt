@@ -1,0 +1,800 @@
+op0_op1_op2_op3: GroupedSchedulerNode(NoneType)
+op0_op1_op2_op3.writes = 
+    [   StarDep(name='buf0', mode=None),
+        StarDep(name='buf1', mode=None),
+        StarDep(name='buf2', mode=None),
+        StarDep(name='buf3', mode=None),
+        StarDep(name='buf4', mode=None),
+        StarDep(name='buf5', mode=None)]
+op0_op1_op2_op3.unmet_dependencies = []
+op0_op1_op2_op3.met_dependencies = [StarDep(name='primals_2', mode=None)]
+op0_op1_op2_op3.outputs = [
+    buf0: FallbackKernel
+    buf0.layout = MultiOutputLayout(device=device(type='cuda', index=1))
+    buf0.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op1'), can_inplace=False, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op2'), can_inplace=False, is_weak=False),
+    ]
+    buf1: MultiOutput
+    buf1.layout = FixedLayout('cuda', torch.bfloat16, size=[128], stride=[1])
+    buf1.users = [NodeUser(node=ExternKernelSchedulerNode(name='op3'), can_inplace=False, is_weak=False)]
+    buf2: MultiOutput
+    buf2.layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+    buf2.users = [NodeUser(node=ExternKernelSchedulerNode(name='op3'), can_inplace=False, is_weak=False)]
+    buf3: _CollectiveKernel
+    buf3.layout = <torch._inductor.ir.NoneLayout object at 0x146f01461d30>
+    buf3.aliases = ['buf1', 'buf2']
+    buf3.users = [NodeUser(node=ExternKernelSchedulerNode(name='op3'), can_inplace=False, is_weak=False)]
+    buf4: MutationOutput
+    buf4.layout = <torch._inductor.ir.NoneLayout object at 0x146f011eac30>
+    buf4.mutations = ['buf1']
+    buf4.users = []
+    buf5: MutationOutput
+    buf5.layout = <torch._inductor.ir.NoneLayout object at 0x146f01cca1b0>
+    buf5.mutations = ['buf2']
+    buf5.users = [NodeUser(node=ExternKernelSchedulerNode(name='op4'), can_inplace=False, is_weak=False)]
+]
+
+
+op4_op7_op8: GroupedSchedulerNode(NoneType)
+op4_op7_op8.writes = 
+    [   StarDep(name='buf10', mode=None),
+        StarDep(name='buf11', mode=None),
+        StarDep(name='buf12', mode=None),
+        StarDep(name='buf13', mode=None),
+        StarDep(name='buf14', mode=None),
+        StarDep(name='buf6', mode=None),
+        StarDep(name='buf7', mode=None)]
+op4_op7_op8.unmet_dependencies = [StarDep(name='buf5', mode=None), StarDep(name='buf9', mode=None)]
+op4_op7_op8.met_dependencies = 
+    [   StarDep(name='primals_3', mode=None),
+        WeakDep(name='buf10', mutating_buf='buf13'),
+        WeakDep(name='buf11', mutating_buf='buf13')]
+op4_op7_op8.outputs = [
+    buf6: _WaitKernel
+    buf6.layout = <torch._inductor.ir.NoneLayout object at 0x146f0149ee40>
+    buf6.users = []
+    buf7: MutationOutput
+    buf7.layout = <torch._inductor.ir.NoneLayout object at 0x146f01223ec0>
+    buf7.mutations = ['buf2']
+    buf7.users = [NodeUser(node=ExternKernelSchedulerNode(name='op7'), can_inplace=False, is_weak=False)]
+    buf10: FallbackKernel
+    buf10.layout = <torch._inductor.ir.NoneLayout object at 0x146f018d0e30>
+    buf10.aliases = ['buf9']
+    buf10.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op7'), can_inplace=False, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op8'), can_inplace=False, is_weak=False),
+    ]
+    buf11: MutationOutput
+    buf11.layout = <torch._inductor.ir.NoneLayout object at 0x146f013e5e50>
+    buf11.mutations = ['buf9']
+    buf11.users = [NodeUser(node=ExternKernelSchedulerNode(name='op8'), can_inplace=False, is_weak=False)]
+    buf12: SetSourceTensorKernel
+    buf12.layout = FixedLayout('cuda', torch.bfloat16, size=[16, 16], stride=[16, 1])
+    buf12.aliases = ['primals_3', 'buf9']
+    buf12.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op7'), can_inplace=False, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op8'), can_inplace=False, is_weak=False),
+    ]
+    buf13: MutationOutput
+    buf13.layout = <torch._inductor.ir.NoneLayout object at 0x146f011eaf00>
+    buf13.mutations = ['primals_3']
+    buf13.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op9'), can_inplace=False, is_weak=False),
+        NodeUser(node=OUTPUT, can_inplace=False, is_weak=False),
+    ]
+    buf14: MutationOutput
+    buf14.layout = <torch._inductor.ir.NoneLayout object at 0x146f01251250>
+    buf14.mutations = ['buf9']
+    buf14.users = [NodeUser(node=ExternKernelSchedulerNode(name='op11'), can_inplace=False, is_weak=True)]
+]
+
+
+op5: NopKernelSchedulerNode(ComputedBuffer)
+op5.writes = [MemoryDep('buf8', d0, {d0: 0}, None)]
+op5.unmet_dependencies = []
+op5.met_dependencies = []
+op5.outputs = [
+    buf8: ComputedBuffer
+    buf8.layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+    buf8.users = [
+        NodeUser(node=SchedulerNode(name='op6'), can_inplace=True, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op11'), can_inplace=False, is_weak=False),
+    ]
+]
+
+
+op6: SchedulerNode(ComputedBuffer)
+op6.writes = [MemoryDep('buf9', c0, {c0: 256}, None)]
+op6.unmet_dependencies = [MemoryDep('buf8', c0, {c0: 256}, None)]
+op6.met_dependencies = []
+op6.outputs = [
+    buf9: ComputedBuffer
+    buf9.layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+    buf9.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op7'), can_inplace=False, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op8'), can_inplace=False, is_weak=False),
+    ]
+]
+op6.group.device = cuda:1
+op6.group.iteration = (256, 1)
+op6.sizes = ([256], [])
+buf8_layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+buf9_layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+class op6_loop_body:
+    var_ranges = {z0: 256}
+    index0 = z0
+    def body(self, ops):
+        get_index = self.get_index('index0')
+        load = ops.load('buf8', get_index)
+        get_index_1 = self.get_index('index0')
+        store = ops.store('buf9', get_index_1, load, None)
+        return store
+op6 Triton code:
+    import triton
+    import triton.language as tl
+    from triton.compiler.compiler import AttrsDescriptor
+
+    from torch._inductor.runtime import triton_helpers, triton_heuristics
+    from torch._inductor.runtime.triton_helpers import libdevice, math as tl_math
+    from torch._inductor.runtime.hints import AutotuneHint, ReductionHint, TileHint, instance_descriptor, DeviceProperties
+
+    @triton_heuristics.pointwise(
+        size_hints=[256], 
+        filename=__file__,
+        triton_meta={'signature': {0: '*bf16', 1: '*bf16', 2: 'i32'}, 'device': DeviceProperties(type='cuda', index=1, cc=80, major=8, regs_per_multiprocessor=65536, max_threads_per_multi_processor=2048, multi_processor_count=108), 'constants': {}, 'configs': [AttrsDescriptor(divisible_by_16=(0, 1, 2), equal_to_1=())]},
+        inductor_meta={'autotune_hints': set(), 'kernel_name': 'Placeholder.DESCRIPTIVE_NAME', 'mutated_arg_names': [], 'no_x_dim': False, 'num_load': 1, 'num_reduction': 0, 'backend_hash': 'A9C866B4A14FD3277824029365D703C2427B2E685E54EC9B3EF4ADC8D1EEAC1D', 'are_deterministic_algorithms_enabled': False, 'assert_indirect_indexing': True, 'autotune_local_cache': True, 'autotune_pointwise': True, 'autotune_remote_cache': None, 'force_disable_caches': False, 'dynamic_scale_rblock': True, 'max_autotune': False, 'max_autotune_pointwise': False, 'min_split_scan_rblock': 256, 'spill_threshold': 16, 'store_cubin': False},
+        min_elem_per_thread=0
+    )
+    @triton.jit
+    def triton_(in_ptr0, out_ptr0, xnumel, XBLOCK : tl.constexpr):
+        xnumel = 256
+        xoffset = tl.program_id(0) * XBLOCK
+        xindex = xoffset + tl.arange(0, XBLOCK)[:]
+        xmask = xindex < xnumel
+        x0 = xindex
+        tmp0 = tl.load(in_ptr0 + (x0), xmask).to(tl.float32)
+        tl.store(out_ptr0 + (x0), tmp0, xmask)
+
+
+op9: ExternKernelSchedulerNode(ExternKernelOut)
+op9.writes = [StarDep(name='buf15', mode=None)]
+op9.unmet_dependencies = [StarDep(name='buf13', mode=None)]
+op9.met_dependencies = [StarDep(name='primals_1', mode=None)]
+op9.outputs = [
+    buf15: ExternKernelOut
+    buf15.layout = FixedLayout('cuda', torch.bfloat16, size=[1, 16], stride=[16, 1])
+    buf15.users = [NodeUser(node=SchedulerNode(name='op10'), can_inplace=True, is_weak=False)]
+]
+op9.node.kernel = extern_kernels.mm
+
+
+op10: SchedulerNode(ComputedBuffer)
+op10.writes = [MemoryDep('buf16', c0, {c0: 16}, None)]
+op10.unmet_dependencies = [MemoryDep('buf15', c0, {c0: 16}, None)]
+op10.met_dependencies = []
+op10.outputs = [
+    buf16: ComputedBuffer
+    buf16.layout = FixedLayout('cuda', torch.bfloat16, size=[1, 16], stride=[16, 1])
+    buf16.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op21'), can_inplace=False, is_weak=False),
+        NodeUser(node=OUTPUT, can_inplace=False, is_weak=False),
+    ]
+]
+op10.group.device = cuda:1
+op10.group.iteration = (16, 1)
+op10.sizes = ([16], [])
+buf15_layout = FixedLayout('cuda', torch.bfloat16, size=[1, 16], stride=[16, 1])
+buf16_layout = FixedLayout('cuda', torch.bfloat16, size=[1, 16], stride=[16, 1])
+class op10_loop_body:
+    var_ranges = {z0: 16}
+    index0 = z0
+    def body(self, ops):
+        get_index = self.get_index('index0')
+        load = ops.load('buf15', get_index)
+        relu = ops.relu(load)
+        get_index_1 = self.get_index('index0')
+        store = ops.store('buf16', get_index_1, relu, None)
+        return store
+op10 Triton code:
+    import triton
+    import triton.language as tl
+    from triton.compiler.compiler import AttrsDescriptor
+
+    from torch._inductor.runtime import triton_helpers, triton_heuristics
+    from torch._inductor.runtime.triton_helpers import libdevice, math as tl_math
+    from torch._inductor.runtime.hints import AutotuneHint, ReductionHint, TileHint, instance_descriptor, DeviceProperties
+
+    @triton_heuristics.pointwise(
+        size_hints=[16], 
+        filename=__file__,
+        triton_meta={'signature': {0: '*bf16', 1: 'i32'}, 'device': DeviceProperties(type='cuda', index=1, cc=80, major=8, regs_per_multiprocessor=65536, max_threads_per_multi_processor=2048, multi_processor_count=108), 'constants': {}, 'configs': [AttrsDescriptor(divisible_by_16=(0, 1), equal_to_1=())]},
+        inductor_meta={'autotune_hints': set(), 'kernel_name': 'Placeholder.DESCRIPTIVE_NAME', 'mutated_arg_names': ['in_out_ptr0'], 'no_x_dim': False, 'num_load': 1, 'num_reduction': 0, 'backend_hash': 'A9C866B4A14FD3277824029365D703C2427B2E685E54EC9B3EF4ADC8D1EEAC1D', 'are_deterministic_algorithms_enabled': False, 'assert_indirect_indexing': True, 'autotune_local_cache': True, 'autotune_pointwise': True, 'autotune_remote_cache': None, 'force_disable_caches': False, 'dynamic_scale_rblock': True, 'max_autotune': False, 'max_autotune_pointwise': False, 'min_split_scan_rblock': 256, 'spill_threshold': 16, 'store_cubin': False},
+        min_elem_per_thread=0
+    )
+    @triton.jit
+    def triton_(in_out_ptr0, xnumel, XBLOCK : tl.constexpr):
+        xnumel = 16
+        xoffset = tl.program_id(0) * XBLOCK
+        xindex = xoffset + tl.arange(0, XBLOCK)[:]
+        xmask = xindex < xnumel
+        x0 = xindex
+        tmp0 = tl.load(in_out_ptr0 + (x0), xmask).to(tl.float32)
+        tmp1 = tl.full([1], 0, tl.int32)
+        tmp2 = triton_helpers.maximum(tmp1, tmp0)
+        tl.store(in_out_ptr0 + (x0), tmp2, xmask)
+
+
+op11: ExternKernelSchedulerNode(ResizeStorageBytes)
+op11.writes = [StarDep(name='buf17', mode=None)]
+op11.unmet_dependencies = [StarDep(name='buf8', mode=None), WeakDep(name='buf14', mutating_buf='buf17')]
+op11.met_dependencies = []
+op11.outputs = [
+    buf17: ResizeStorageBytes
+    buf17.layout = <torch._inductor.ir.NoneLayout object at 0x146f011fc6e0>
+    buf17.mutations = ['buf8']
+    buf17.users = []
+]
+op11.node.kernel = inductor_ops.resize_storage_bytes_
+
+
+op12_op13_op14_op15: GroupedSchedulerNode(NoneType)
+op12_op13_op14_op15.writes = 
+    [   StarDep(name='buf18', mode=None),
+        StarDep(name='buf19', mode=None),
+        StarDep(name='buf20', mode=None),
+        StarDep(name='buf21', mode=None),
+        StarDep(name='buf22', mode=None),
+        StarDep(name='buf23', mode=None)]
+op12_op13_op14_op15.unmet_dependencies = 
+    [   WeakDep(name='buf0', mutating_buf='buf18'),
+        WeakDep(name='buf1', mutating_buf='buf18'),
+        WeakDep(name='buf10', mutating_buf='buf18'),
+        WeakDep(name='buf11', mutating_buf='buf18'),
+        WeakDep(name='buf12', mutating_buf='buf18'),
+        WeakDep(name='buf13', mutating_buf='buf18'),
+        WeakDep(name='buf14', mutating_buf='buf18'),
+        WeakDep(name='buf2', mutating_buf='buf18'),
+        WeakDep(name='buf3', mutating_buf='buf18'),
+        WeakDep(name='buf4', mutating_buf='buf18'),
+        WeakDep(name='buf5', mutating_buf='buf18'),
+        WeakDep(name='buf6', mutating_buf='buf18'),
+        WeakDep(name='buf7', mutating_buf='buf18')]
+op12_op13_op14_op15.met_dependencies = [StarDep(name='primals_5', mode=None)]
+op12_op13_op14_op15.outputs = [
+    buf18: FallbackKernel
+    buf18.layout = MultiOutputLayout(device=device(type='cuda', index=1))
+    buf18.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op13'), can_inplace=False, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op14'), can_inplace=False, is_weak=False),
+    ]
+    buf19: MultiOutput
+    buf19.layout = FixedLayout('cuda', torch.bfloat16, size=[128], stride=[1])
+    buf19.users = [NodeUser(node=ExternKernelSchedulerNode(name='op15'), can_inplace=False, is_weak=False)]
+    buf20: MultiOutput
+    buf20.layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+    buf20.users = [NodeUser(node=ExternKernelSchedulerNode(name='op15'), can_inplace=False, is_weak=False)]
+    buf21: _CollectiveKernel
+    buf21.layout = <torch._inductor.ir.NoneLayout object at 0x146f01885970>
+    buf21.aliases = ['buf19', 'buf20']
+    buf21.users = [NodeUser(node=ExternKernelSchedulerNode(name='op15'), can_inplace=False, is_weak=False)]
+    buf22: MutationOutput
+    buf22.layout = <torch._inductor.ir.NoneLayout object at 0x146f011fe5a0>
+    buf22.mutations = ['buf19']
+    buf22.users = []
+    buf23: MutationOutput
+    buf23.layout = <torch._inductor.ir.NoneLayout object at 0x146f013e5f10>
+    buf23.mutations = ['buf20']
+    buf23.users = [NodeUser(node=ExternKernelSchedulerNode(name='op16'), can_inplace=False, is_weak=False)]
+]
+
+
+op16_op19_op20: GroupedSchedulerNode(NoneType)
+op16_op19_op20.writes = 
+    [   StarDep(name='buf24', mode=None),
+        StarDep(name='buf25', mode=None),
+        StarDep(name='buf28', mode=None),
+        StarDep(name='buf29', mode=None),
+        StarDep(name='buf30', mode=None),
+        StarDep(name='buf31', mode=None),
+        StarDep(name='buf32', mode=None)]
+op16_op19_op20.unmet_dependencies = [StarDep(name='buf23', mode=None), StarDep(name='buf27', mode=None)]
+op16_op19_op20.met_dependencies = 
+    [   StarDep(name='primals_6', mode=None),
+        WeakDep(name='buf28', mutating_buf='buf31'),
+        WeakDep(name='buf29', mutating_buf='buf31')]
+op16_op19_op20.outputs = [
+    buf24: _WaitKernel
+    buf24.layout = <torch._inductor.ir.NoneLayout object at 0x146f013e4ec0>
+    buf24.users = []
+    buf25: MutationOutput
+    buf25.layout = <torch._inductor.ir.NoneLayout object at 0x146f011ea7b0>
+    buf25.mutations = ['buf20']
+    buf25.users = [NodeUser(node=ExternKernelSchedulerNode(name='op19'), can_inplace=False, is_weak=False)]
+    buf28: FallbackKernel
+    buf28.layout = <torch._inductor.ir.NoneLayout object at 0x146f01e5bc80>
+    buf28.aliases = ['buf27']
+    buf28.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op19'), can_inplace=False, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op20'), can_inplace=False, is_weak=False),
+    ]
+    buf29: MutationOutput
+    buf29.layout = <torch._inductor.ir.NoneLayout object at 0x146fb953bb00>
+    buf29.mutations = ['buf27']
+    buf29.users = [NodeUser(node=ExternKernelSchedulerNode(name='op20'), can_inplace=False, is_weak=False)]
+    buf30: SetSourceTensorKernel
+    buf30.layout = FixedLayout('cuda', torch.bfloat16, size=[16, 16], stride=[16, 1])
+    buf30.aliases = ['primals_6', 'buf27']
+    buf30.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op19'), can_inplace=False, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op20'), can_inplace=False, is_weak=False),
+    ]
+    buf31: MutationOutput
+    buf31.layout = <torch._inductor.ir.NoneLayout object at 0x146f011eb050>
+    buf31.mutations = ['primals_6']
+    buf31.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op21'), can_inplace=False, is_weak=False),
+        NodeUser(node=OUTPUT, can_inplace=False, is_weak=False),
+    ]
+    buf32: MutationOutput
+    buf32.layout = <torch._inductor.ir.NoneLayout object at 0x146f01253350>
+    buf32.mutations = ['buf27']
+    buf32.users = [NodeUser(node=ExternKernelSchedulerNode(name='op23'), can_inplace=False, is_weak=True)]
+]
+
+
+op17: NopKernelSchedulerNode(ComputedBuffer)
+op17.writes = [MemoryDep('buf26', d0, {d0: 0}, None)]
+op17.unmet_dependencies = []
+op17.met_dependencies = []
+op17.outputs = [
+    buf26: ComputedBuffer
+    buf26.layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+    buf26.users = [
+        NodeUser(node=SchedulerNode(name='op18'), can_inplace=True, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op23'), can_inplace=False, is_weak=False),
+    ]
+]
+
+
+op18: SchedulerNode(ComputedBuffer)
+op18.writes = [MemoryDep('buf27', c0, {c0: 256}, None)]
+op18.unmet_dependencies = [MemoryDep('buf26', c0, {c0: 256}, None)]
+op18.met_dependencies = []
+op18.outputs = [
+    buf27: ComputedBuffer
+    buf27.layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+    buf27.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op19'), can_inplace=False, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op20'), can_inplace=False, is_weak=False),
+    ]
+]
+op18.group.device = cuda:1
+op18.group.iteration = (256, 1)
+op18.sizes = ([256], [])
+buf26_layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+buf27_layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+class op18_loop_body:
+    var_ranges = {z0: 256}
+    index0 = z0
+    def body(self, ops):
+        get_index = self.get_index('index0')
+        load = ops.load('buf26', get_index)
+        get_index_1 = self.get_index('index0')
+        store = ops.store('buf27', get_index_1, load, None)
+        return store
+op18 Triton code:
+    import triton
+    import triton.language as tl
+    from triton.compiler.compiler import AttrsDescriptor
+
+    from torch._inductor.runtime import triton_helpers, triton_heuristics
+    from torch._inductor.runtime.triton_helpers import libdevice, math as tl_math
+    from torch._inductor.runtime.hints import AutotuneHint, ReductionHint, TileHint, instance_descriptor, DeviceProperties
+
+    @triton_heuristics.pointwise(
+        size_hints=[256], 
+        filename=__file__,
+        triton_meta={'signature': {0: '*bf16', 1: '*bf16', 2: 'i32'}, 'device': DeviceProperties(type='cuda', index=1, cc=80, major=8, regs_per_multiprocessor=65536, max_threads_per_multi_processor=2048, multi_processor_count=108), 'constants': {}, 'configs': [AttrsDescriptor(divisible_by_16=(0, 1, 2), equal_to_1=())]},
+        inductor_meta={'autotune_hints': set(), 'kernel_name': 'Placeholder.DESCRIPTIVE_NAME', 'mutated_arg_names': [], 'no_x_dim': False, 'num_load': 1, 'num_reduction': 0, 'backend_hash': 'A9C866B4A14FD3277824029365D703C2427B2E685E54EC9B3EF4ADC8D1EEAC1D', 'are_deterministic_algorithms_enabled': False, 'assert_indirect_indexing': True, 'autotune_local_cache': True, 'autotune_pointwise': True, 'autotune_remote_cache': None, 'force_disable_caches': False, 'dynamic_scale_rblock': True, 'max_autotune': False, 'max_autotune_pointwise': False, 'min_split_scan_rblock': 256, 'spill_threshold': 16, 'store_cubin': False},
+        min_elem_per_thread=0
+    )
+    @triton.jit
+    def triton_(in_ptr0, out_ptr0, xnumel, XBLOCK : tl.constexpr):
+        xnumel = 256
+        xoffset = tl.program_id(0) * XBLOCK
+        xindex = xoffset + tl.arange(0, XBLOCK)[:]
+        xmask = xindex < xnumel
+        x0 = xindex
+        tmp0 = tl.load(in_ptr0 + (x0), xmask).to(tl.float32)
+        tl.store(out_ptr0 + (x0), tmp0, xmask)
+
+
+op21: ExternKernelSchedulerNode(ExternKernelOut)
+op21.writes = [StarDep(name='buf33', mode=None)]
+op21.unmet_dependencies = [StarDep(name='buf16', mode=None), StarDep(name='buf31', mode=None)]
+op21.met_dependencies = []
+op21.outputs = [
+    buf33: ExternKernelOut
+    buf33.layout = FixedLayout('cuda', torch.bfloat16, size=[1, 16], stride=[16, 1])
+    buf33.users = [NodeUser(node=SchedulerNode(name='op22'), can_inplace=True, is_weak=False)]
+]
+op21.node.kernel = extern_kernels.mm
+
+
+op22: SchedulerNode(ComputedBuffer)
+op22.writes = [MemoryDep('buf34', c0, {c0: 16}, None)]
+op22.unmet_dependencies = [MemoryDep('buf33', c0, {c0: 16}, None)]
+op22.met_dependencies = []
+op22.outputs = [
+    buf34: ComputedBuffer
+    buf34.layout = FixedLayout('cuda', torch.bfloat16, size=[1, 16], stride=[16, 1])
+    buf34.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op33'), can_inplace=False, is_weak=False),
+        NodeUser(node=OUTPUT, can_inplace=False, is_weak=False),
+    ]
+]
+op22.group.device = cuda:1
+op22.group.iteration = (16, 1)
+op22.sizes = ([16], [])
+buf33_layout = FixedLayout('cuda', torch.bfloat16, size=[1, 16], stride=[16, 1])
+buf34_layout = FixedLayout('cuda', torch.bfloat16, size=[1, 16], stride=[16, 1])
+class op22_loop_body:
+    var_ranges = {z0: 16}
+    index0 = z0
+    def body(self, ops):
+        get_index = self.get_index('index0')
+        load = ops.load('buf33', get_index)
+        relu = ops.relu(load)
+        get_index_1 = self.get_index('index0')
+        store = ops.store('buf34', get_index_1, relu, None)
+        return store
+op22 Triton code:
+    import triton
+    import triton.language as tl
+    from triton.compiler.compiler import AttrsDescriptor
+
+    from torch._inductor.runtime import triton_helpers, triton_heuristics
+    from torch._inductor.runtime.triton_helpers import libdevice, math as tl_math
+    from torch._inductor.runtime.hints import AutotuneHint, ReductionHint, TileHint, instance_descriptor, DeviceProperties
+
+    @triton_heuristics.pointwise(
+        size_hints=[16], 
+        filename=__file__,
+        triton_meta={'signature': {0: '*bf16', 1: 'i32'}, 'device': DeviceProperties(type='cuda', index=1, cc=80, major=8, regs_per_multiprocessor=65536, max_threads_per_multi_processor=2048, multi_processor_count=108), 'constants': {}, 'configs': [AttrsDescriptor(divisible_by_16=(0, 1), equal_to_1=())]},
+        inductor_meta={'autotune_hints': set(), 'kernel_name': 'Placeholder.DESCRIPTIVE_NAME', 'mutated_arg_names': ['in_out_ptr0'], 'no_x_dim': False, 'num_load': 1, 'num_reduction': 0, 'backend_hash': 'A9C866B4A14FD3277824029365D703C2427B2E685E54EC9B3EF4ADC8D1EEAC1D', 'are_deterministic_algorithms_enabled': False, 'assert_indirect_indexing': True, 'autotune_local_cache': True, 'autotune_pointwise': True, 'autotune_remote_cache': None, 'force_disable_caches': False, 'dynamic_scale_rblock': True, 'max_autotune': False, 'max_autotune_pointwise': False, 'min_split_scan_rblock': 256, 'spill_threshold': 16, 'store_cubin': False},
+        min_elem_per_thread=0
+    )
+    @triton.jit
+    def triton_(in_out_ptr0, xnumel, XBLOCK : tl.constexpr):
+        xnumel = 16
+        xoffset = tl.program_id(0) * XBLOCK
+        xindex = xoffset + tl.arange(0, XBLOCK)[:]
+        xmask = xindex < xnumel
+        x0 = xindex
+        tmp0 = tl.load(in_out_ptr0 + (x0), xmask).to(tl.float32)
+        tmp1 = tl.full([1], 0, tl.int32)
+        tmp2 = triton_helpers.maximum(tmp1, tmp0)
+        tl.store(in_out_ptr0 + (x0), tmp2, xmask)
+
+
+op23: ExternKernelSchedulerNode(ResizeStorageBytes)
+op23.writes = [StarDep(name='buf35', mode=None)]
+op23.unmet_dependencies = [StarDep(name='buf26', mode=None), WeakDep(name='buf32', mutating_buf='buf35')]
+op23.met_dependencies = []
+op23.outputs = [
+    buf35: ResizeStorageBytes
+    buf35.layout = <torch._inductor.ir.NoneLayout object at 0x146f010685c0>
+    buf35.mutations = ['buf26']
+    buf35.users = []
+]
+op23.node.kernel = inductor_ops.resize_storage_bytes_
+
+
+op24_op25_op26_op27: GroupedSchedulerNode(NoneType)
+op24_op25_op26_op27.writes = 
+    [   StarDep(name='buf36', mode=None),
+        StarDep(name='buf37', mode=None),
+        StarDep(name='buf38', mode=None),
+        StarDep(name='buf39', mode=None),
+        StarDep(name='buf40', mode=None),
+        StarDep(name='buf41', mode=None)]
+op24_op25_op26_op27.unmet_dependencies = 
+    [   WeakDep(name='buf18', mutating_buf='buf36'),
+        WeakDep(name='buf19', mutating_buf='buf36'),
+        WeakDep(name='buf20', mutating_buf='buf36'),
+        WeakDep(name='buf21', mutating_buf='buf36'),
+        WeakDep(name='buf22', mutating_buf='buf36'),
+        WeakDep(name='buf23', mutating_buf='buf36'),
+        WeakDep(name='buf24', mutating_buf='buf36'),
+        WeakDep(name='buf25', mutating_buf='buf36'),
+        WeakDep(name='buf28', mutating_buf='buf36'),
+        WeakDep(name='buf29', mutating_buf='buf36'),
+        WeakDep(name='buf30', mutating_buf='buf36'),
+        WeakDep(name='buf31', mutating_buf='buf36'),
+        WeakDep(name='buf32', mutating_buf='buf36')]
+op24_op25_op26_op27.met_dependencies = [StarDep(name='primals_7', mode=None)]
+op24_op25_op26_op27.outputs = [
+    buf36: FallbackKernel
+    buf36.layout = MultiOutputLayout(device=device(type='cuda', index=1))
+    buf36.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op25'), can_inplace=False, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op26'), can_inplace=False, is_weak=False),
+    ]
+    buf37: MultiOutput
+    buf37.layout = FixedLayout('cuda', torch.bfloat16, size=[128], stride=[1])
+    buf37.users = [NodeUser(node=ExternKernelSchedulerNode(name='op27'), can_inplace=False, is_weak=False)]
+    buf38: MultiOutput
+    buf38.layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+    buf38.users = [NodeUser(node=ExternKernelSchedulerNode(name='op27'), can_inplace=False, is_weak=False)]
+    buf39: _CollectiveKernel
+    buf39.layout = <torch._inductor.ir.NoneLayout object at 0x146f016788f0>
+    buf39.aliases = ['buf37', 'buf38']
+    buf39.users = [NodeUser(node=ExternKernelSchedulerNode(name='op27'), can_inplace=False, is_weak=False)]
+    buf40: MutationOutput
+    buf40.layout = <torch._inductor.ir.NoneLayout object at 0x146f01252d50>
+    buf40.mutations = ['buf37']
+    buf40.users = []
+    buf41: MutationOutput
+    buf41.layout = <torch._inductor.ir.NoneLayout object at 0x146f01250860>
+    buf41.mutations = ['buf38']
+    buf41.users = [NodeUser(node=ExternKernelSchedulerNode(name='op28'), can_inplace=False, is_weak=False)]
+]
+
+
+op28_op31_op32: GroupedSchedulerNode(NoneType)
+op28_op31_op32.writes = 
+    [   StarDep(name='buf42', mode=None),
+        StarDep(name='buf43', mode=None),
+        StarDep(name='buf46', mode=None),
+        StarDep(name='buf47', mode=None),
+        StarDep(name='buf48', mode=None),
+        StarDep(name='buf49', mode=None),
+        StarDep(name='buf50', mode=None)]
+op28_op31_op32.unmet_dependencies = [StarDep(name='buf41', mode=None), StarDep(name='buf45', mode=None)]
+op28_op31_op32.met_dependencies = 
+    [   StarDep(name='primals_8', mode=None),
+        WeakDep(name='buf46', mutating_buf='buf49'),
+        WeakDep(name='buf47', mutating_buf='buf49')]
+op28_op31_op32.outputs = [
+    buf42: _WaitKernel
+    buf42.layout = <torch._inductor.ir.NoneLayout object at 0x146f01250650>
+    buf42.users = []
+    buf43: MutationOutput
+    buf43.layout = <torch._inductor.ir.NoneLayout object at 0x146f01069b80>
+    buf43.mutations = ['buf38']
+    buf43.users = [NodeUser(node=ExternKernelSchedulerNode(name='op31'), can_inplace=False, is_weak=False)]
+    buf46: FallbackKernel
+    buf46.layout = <torch._inductor.ir.NoneLayout object at 0x146f011fe750>
+    buf46.aliases = ['buf45']
+    buf46.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op31'), can_inplace=False, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op32'), can_inplace=False, is_weak=False),
+    ]
+    buf47: MutationOutput
+    buf47.layout = <torch._inductor.ir.NoneLayout object at 0x146f0106b1a0>
+    buf47.mutations = ['buf45']
+    buf47.users = [NodeUser(node=ExternKernelSchedulerNode(name='op32'), can_inplace=False, is_weak=False)]
+    buf48: SetSourceTensorKernel
+    buf48.layout = FixedLayout('cuda', torch.bfloat16, size=[16, 16], stride=[16, 1])
+    buf48.aliases = ['primals_8', 'buf45']
+    buf48.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op31'), can_inplace=False, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op32'), can_inplace=False, is_weak=False),
+    ]
+    buf49: MutationOutput
+    buf49.layout = <torch._inductor.ir.NoneLayout object at 0x146f0106b860>
+    buf49.mutations = ['primals_8']
+    buf49.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op33'), can_inplace=False, is_weak=False),
+        NodeUser(node=OUTPUT, can_inplace=False, is_weak=False),
+    ]
+    buf50: MutationOutput
+    buf50.layout = <torch._inductor.ir.NoneLayout object at 0x146f0106ba10>
+    buf50.mutations = ['buf45']
+    buf50.users = [NodeUser(node=ExternKernelSchedulerNode(name='op35'), can_inplace=False, is_weak=True)]
+]
+
+
+op29: NopKernelSchedulerNode(ComputedBuffer)
+op29.writes = [MemoryDep('buf44', d0, {d0: 0}, None)]
+op29.unmet_dependencies = []
+op29.met_dependencies = []
+op29.outputs = [
+    buf44: ComputedBuffer
+    buf44.layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+    buf44.users = [
+        NodeUser(node=SchedulerNode(name='op30'), can_inplace=True, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op35'), can_inplace=False, is_weak=False),
+    ]
+]
+
+
+op30: SchedulerNode(ComputedBuffer)
+op30.writes = [MemoryDep('buf45', c0, {c0: 256}, None)]
+op30.unmet_dependencies = [MemoryDep('buf44', c0, {c0: 256}, None)]
+op30.met_dependencies = []
+op30.outputs = [
+    buf45: ComputedBuffer
+    buf45.layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+    buf45.users = [
+        NodeUser(node=ExternKernelSchedulerNode(name='op31'), can_inplace=False, is_weak=False),
+        NodeUser(node=ExternKernelSchedulerNode(name='op32'), can_inplace=False, is_weak=False),
+    ]
+]
+op30.group.device = cuda:1
+op30.group.iteration = (256, 1)
+op30.sizes = ([256], [])
+buf44_layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+buf45_layout = FixedLayout('cuda', torch.bfloat16, size=[256], stride=[1])
+class op30_loop_body:
+    var_ranges = {z0: 256}
+    index0 = z0
+    def body(self, ops):
+        get_index = self.get_index('index0')
+        load = ops.load('buf44', get_index)
+        get_index_1 = self.get_index('index0')
+        store = ops.store('buf45', get_index_1, load, None)
+        return store
+op30 Triton code:
+    import triton
+    import triton.language as tl
+    from triton.compiler.compiler import AttrsDescriptor
+
+    from torch._inductor.runtime import triton_helpers, triton_heuristics
+    from torch._inductor.runtime.triton_helpers import libdevice, math as tl_math
+    from torch._inductor.runtime.hints import AutotuneHint, ReductionHint, TileHint, instance_descriptor, DeviceProperties
+
+    @triton_heuristics.pointwise(
+        size_hints=[256], 
+        filename=__file__,
+        triton_meta={'signature': {0: '*bf16', 1: '*bf16', 2: 'i32'}, 'device': DeviceProperties(type='cuda', index=1, cc=80, major=8, regs_per_multiprocessor=65536, max_threads_per_multi_processor=2048, multi_processor_count=108), 'constants': {}, 'configs': [AttrsDescriptor(divisible_by_16=(0, 1, 2), equal_to_1=())]},
+        inductor_meta={'autotune_hints': set(), 'kernel_name': 'Placeholder.DESCRIPTIVE_NAME', 'mutated_arg_names': [], 'no_x_dim': False, 'num_load': 1, 'num_reduction': 0, 'backend_hash': 'A9C866B4A14FD3277824029365D703C2427B2E685E54EC9B3EF4ADC8D1EEAC1D', 'are_deterministic_algorithms_enabled': False, 'assert_indirect_indexing': True, 'autotune_local_cache': True, 'autotune_pointwise': True, 'autotune_remote_cache': None, 'force_disable_caches': False, 'dynamic_scale_rblock': True, 'max_autotune': False, 'max_autotune_pointwise': False, 'min_split_scan_rblock': 256, 'spill_threshold': 16, 'store_cubin': False},
+        min_elem_per_thread=0
+    )
+    @triton.jit
+    def triton_(in_ptr0, out_ptr0, xnumel, XBLOCK : tl.constexpr):
+        xnumel = 256
+        xoffset = tl.program_id(0) * XBLOCK
+        xindex = xoffset + tl.arange(0, XBLOCK)[:]
+        xmask = xindex < xnumel
+        x0 = xindex
+        tmp0 = tl.load(in_ptr0 + (x0), xmask).to(tl.float32)
+        tl.store(out_ptr0 + (x0), tmp0, xmask)
+
+
+op33: ExternKernelSchedulerNode(ExternKernelOut)
+op33.writes = [StarDep(name='buf51', mode=None)]
+op33.unmet_dependencies = [StarDep(name='buf34', mode=None), StarDep(name='buf49', mode=None)]
+op33.met_dependencies = []
+op33.outputs = [
+    buf51: ExternKernelOut
+    buf51.layout = FixedLayout('cuda', torch.bfloat16, size=[1, 16], stride=[16, 1])
+    buf51.users = [NodeUser(node=SchedulerNode(name='op34'), can_inplace=True, is_weak=False)]
+]
+op33.node.kernel = extern_kernels.mm
+
+
+op34: SchedulerNode(ComputedBuffer)
+op34.writes = [MemoryDep('buf52', c0, {c0: 16}, None)]
+op34.unmet_dependencies = [MemoryDep('buf51', c0, {c0: 16}, None)]
+op34.met_dependencies = []
+op34.outputs = [
+    buf52: ComputedBuffer
+    buf52.layout = FixedLayout('cuda', torch.bfloat16, size=[1, 16], stride=[16, 1])
+    buf52.users = [
+        NodeUser(node=SchedulerNode(name='op36'), can_inplace=True, is_weak=False),
+        NodeUser(node=OUTPUT, can_inplace=False, is_weak=False),
+    ]
+]
+op34.group.device = cuda:1
+op34.group.iteration = (16, 1)
+op34.sizes = ([16], [])
+buf51_layout = FixedLayout('cuda', torch.bfloat16, size=[1, 16], stride=[16, 1])
+buf52_layout = FixedLayout('cuda', torch.bfloat16, size=[1, 16], stride=[16, 1])
+class op34_loop_body:
+    var_ranges = {z0: 16}
+    index0 = z0
+    def body(self, ops):
+        get_index = self.get_index('index0')
+        load = ops.load('buf51', get_index)
+        relu = ops.relu(load)
+        get_index_1 = self.get_index('index0')
+        store = ops.store('buf52', get_index_1, relu, None)
+        return store
+op34 Triton code:
+    import triton
+    import triton.language as tl
+    from triton.compiler.compiler import AttrsDescriptor
+
+    from torch._inductor.runtime import triton_helpers, triton_heuristics
+    from torch._inductor.runtime.triton_helpers import libdevice, math as tl_math
+    from torch._inductor.runtime.hints import AutotuneHint, ReductionHint, TileHint, instance_descriptor, DeviceProperties
+
+    @triton_heuristics.pointwise(
+        size_hints=[16], 
+        filename=__file__,
+        triton_meta={'signature': {0: '*bf16', 1: 'i32'}, 'device': DeviceProperties(type='cuda', index=1, cc=80, major=8, regs_per_multiprocessor=65536, max_threads_per_multi_processor=2048, multi_processor_count=108), 'constants': {}, 'configs': [AttrsDescriptor(divisible_by_16=(0, 1), equal_to_1=())]},
+        inductor_meta={'autotune_hints': set(), 'kernel_name': 'Placeholder.DESCRIPTIVE_NAME', 'mutated_arg_names': ['in_out_ptr0'], 'no_x_dim': False, 'num_load': 1, 'num_reduction': 0, 'backend_hash': 'A9C866B4A14FD3277824029365D703C2427B2E685E54EC9B3EF4ADC8D1EEAC1D', 'are_deterministic_algorithms_enabled': False, 'assert_indirect_indexing': True, 'autotune_local_cache': True, 'autotune_pointwise': True, 'autotune_remote_cache': None, 'force_disable_caches': False, 'dynamic_scale_rblock': True, 'max_autotune': False, 'max_autotune_pointwise': False, 'min_split_scan_rblock': 256, 'spill_threshold': 16, 'store_cubin': False},
+        min_elem_per_thread=0
+    )
+    @triton.jit
+    def triton_(in_out_ptr0, xnumel, XBLOCK : tl.constexpr):
+        xnumel = 16
+        xoffset = tl.program_id(0) * XBLOCK
+        xindex = xoffset + tl.arange(0, XBLOCK)[:]
+        xmask = xindex < xnumel
+        x0 = xindex
+        tmp0 = tl.load(in_out_ptr0 + (x0), xmask).to(tl.float32)
+        tmp1 = tl.full([1], 0, tl.int32)
+        tmp2 = triton_helpers.maximum(tmp1, tmp0)
+        tl.store(in_out_ptr0 + (x0), tmp2, xmask)
+
+
+op35: ExternKernelSchedulerNode(ResizeStorageBytes)
+op35.writes = [StarDep(name='buf53', mode=None)]
+op35.unmet_dependencies = [StarDep(name='buf44', mode=None), WeakDep(name='buf50', mutating_buf='buf53')]
+op35.met_dependencies = []
+op35.outputs = [
+    buf53: ResizeStorageBytes
+    buf53.layout = <torch._inductor.ir.NoneLayout object at 0x146f0106a1b0>
+    buf53.mutations = ['buf44']
+    buf53.users = []
+]
+op35.node.kernel = inductor_ops.resize_storage_bytes_
+
+
+op36: SchedulerNode(ComputedBuffer)
+op36.writes = [MemoryDep('buf54', c0, {c0: 16}, None)]
+op36.unmet_dependencies = [MemoryDep('buf52', c0, {c0: 16}, None)]
+op36.met_dependencies = []
+op36.outputs = [
+    buf54: ComputedBuffer
+    buf54.layout = FixedLayout('cuda', torch.bool, size=[1, 16], stride=[16, 1])
+    buf54.users = [NodeUser(node=OUTPUT, can_inplace=False, is_weak=False)]
+]
+op36.group.device = cuda:1
+op36.group.iteration = (16, 1)
+op36.sizes = ([16], [])
+buf52_layout = FixedLayout('cuda', torch.bfloat16, size=[1, 16], stride=[16, 1])
+buf54_layout = FixedLayout('cuda', torch.bool, size=[1, 16], stride=[16, 1])
+class op36_loop_body:
+    var_ranges = {z0: 16}
+    index0 = z0
+    def body(self, ops):
+        get_index = self.get_index('index0')
+        load = ops.load('buf52', get_index)
+        constant = ops.constant(0.0, torch.bfloat16)
+        le = ops.le(load, constant)
+        get_index_1 = self.get_index('index0')
+        store = ops.store('buf54', get_index_1, le, None)
+        return store
+op36 Triton code:
+    import triton
+    import triton.language as tl
+    from triton.compiler.compiler import AttrsDescriptor
+
+    from torch._inductor.runtime import triton_helpers, triton_heuristics
+    from torch._inductor.runtime.triton_helpers import libdevice, math as tl_math
+    from torch._inductor.runtime.hints import AutotuneHint, ReductionHint, TileHint, instance_descriptor, DeviceProperties
+
+    @triton_heuristics.pointwise(
+        size_hints=[16], 
+        filename=__file__,
+        triton_meta={'signature': {0: '*bf16', 1: '*i1', 2: 'i32'}, 'device': DeviceProperties(type='cuda', index=1, cc=80, major=8, regs_per_multiprocessor=65536, max_threads_per_multi_processor=2048, multi_processor_count=108), 'constants': {}, 'configs': [AttrsDescriptor(divisible_by_16=(0, 1, 2), equal_to_1=())]},
+        inductor_meta={'autotune_hints': set(), 'kernel_name': 'Placeholder.DESCRIPTIVE_NAME', 'mutated_arg_names': [], 'no_x_dim': False, 'num_load': 1, 'num_reduction': 0, 'backend_hash': 'A9C866B4A14FD3277824029365D703C2427B2E685E54EC9B3EF4ADC8D1EEAC1D', 'are_deterministic_algorithms_enabled': False, 'assert_indirect_indexing': True, 'autotune_local_cache': True, 'autotune_pointwise': True, 'autotune_remote_cache': None, 'force_disable_caches': False, 'dynamic_scale_rblock': True, 'max_autotune': False, 'max_autotune_pointwise': False, 'min_split_scan_rblock': 256, 'spill_threshold': 16, 'store_cubin': False},
+        min_elem_per_thread=0
+    )
+    @triton.jit
+    def triton_(in_ptr0, out_ptr0, xnumel, XBLOCK : tl.constexpr):
+        xnumel = 16
+        xoffset = tl.program_id(0) * XBLOCK
+        xindex = xoffset + tl.arange(0, XBLOCK)[:]
+        xmask = xindex < xnumel
+        x0 = xindex
+        tmp0 = tl.load(in_ptr0 + (x0), xmask).to(tl.float32)
+        tmp1 = 0.0
+        tmp2 = tmp0 <= tmp1
+        tl.store(out_ptr0 + (x0), tmp2, xmask)
+
+
