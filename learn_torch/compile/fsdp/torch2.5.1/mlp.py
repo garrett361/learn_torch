@@ -88,10 +88,9 @@ def test_compiled(
     print("DONE compiled")
 
 
-class BasicModel(nn.Module):
+class MinimalBlock(nn.Module):
     def __init__(self, d_model: int, device: torch.device, dtype: torch.dtype) -> None:
         super().__init__()
-        self.d_model = d_model
         self.lin0 = nn.Linear(d_model, d_model, bias=False, device=device, dtype=dtype)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
@@ -99,10 +98,10 @@ class BasicModel(nn.Module):
         return outputs
 
 
-def get_fsdp_model(device: torch.device, dtype: torch.dtype) -> nn.Module:
-    model = nn.Sequential(*(BasicModel(args.d_model, device, dtype) for _ in range(3)))
+def get_fsdp_model(d_model: int, device: torch.device, dtype: torch.dtype) -> nn.Module:
+    model = nn.Sequential(*(MinimalBlock(d_model, device, dtype) for _ in range(3)))
     for module in model.modules():
-        if isinstance(module, BasicModel):
+        if isinstance(module, MinimalBlock):
             fully_shard(module)
     fully_shard(model)
     return model
@@ -118,7 +117,7 @@ def main(args: argparse.Namespace) -> None:
     torch.cuda.set_device(device)
     init_process_group("nccl")
 
-    model = get_fsdp_model(device, dtype)
+    model = get_fsdp_model(args.d_model, device, dtype)
     if not local_rank:
         print(model)
     optim = None if args.no_optim else torch.optim.SGD(model.parameters(), lr=1e-7)
