@@ -2,7 +2,20 @@ from typing import Callable
 import torch
 
 
-def segprod(x: torch.Tensor, dim: int = -1, offset: int = 0) -> torch.Tensor:
+def naive_assoc_scan(
+    inputs: torch.Tensor,
+    op: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
+    dim: int = 1,
+):
+    """
+    Super naive scan, just for testing.
+    """
+    outputs_list = [torch.select(inputs, dim, 0)]
+    for idx in range(1, inputs.shape[dim]):
+        outputs_list.append(op(torch.select(inputs, dim, idx), outputs_list[-1]))
+    return torch.stack(outputs_list, dim=dim)
+
+
 def segprod(x: torch.Tensor, dim: int = 1, offset: int = 0) -> torch.Tensor:
     """
     For an arbitrary tensor of shape  x.shape=(..., D, ...) with the size D dimension as position
@@ -68,7 +81,27 @@ def prod_bwd(x: torch.Tensor, y: torch.Tensor) -> tuple[torch.Tensor, torch.Tens
     return y, x
 
 
-def get_scan_derivative_pointwise(
+class NonPointwiseOp:
+    """
+    A simple non-pointwise associative op for testing.
+    """
+
+    def __init__(self, W: torch.Tensor):
+        self.W = W
+
+    def fwd(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        return (x + y) @ self.W
+
+    def bwd(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+        """
+        The associative op here is vector valued: out_j = A(x_i, y_i)_j.
+        Put these vector values last
+        """
+        return torch.ones_like(x)[..., None, None] * self.W, torch.ones_like(x)[
+            ..., None, None
+        ] * self.W
+
+
 def get_scan_derivative(
     outputs_grad: torch.Tensor,
     outputs: torch.Tensor,
@@ -119,6 +152,13 @@ class TestAssocScanDerivatives:
     batch_size = 2
     d_model = 16
     dim = 1
+
+    def test_naive_scan(self) -> None:
+        torch.manual_seed(42)
+        inputs = torch.randn(self.batch_size, self.d_model)
+        naive_cumsum = naive_assoc_scan(inputs, torch.add, dim=self.dim)
+        cumsum = inputs.cumsum(dim=self.dim)
+        torch.testing.assert_close(naive_cumsum, cumsum)
 
     def test_segprod(self) -> None:
         torch.manual_seed(42)
@@ -206,3 +246,15 @@ class TestAssocScanDerivatives:
         # Compute the same grads with our helper
         inputs_grad = get_scan_derivative(grad_out, outputs, inputs, prod_bwd, dim=self.dim)
         torch.testing.assert_close(inputs.grad, inputs_grad)
+
+    def test_non_pointwise_scan_correctness(self) -> None:
+        """
+        Just sanity checking.
+        """
+        torch.manual_seed(42)
+        inputs = torch.randn(self.batch_size, self.d_model, self.d_model)
+        W = torch.eye(inputs.shape[-1], dtype=inputs.dtype, device=inputs.device)
+        op = NonPointwiseOp(W)
+        outputs = naive_assoc_scan(inputs, op.fwd, dim=self.dim)
+        assert outputs.shape == inputs.shape
+        torch.testing.assert_close(outputs, inputs.cumsum(dim=self.dim))
