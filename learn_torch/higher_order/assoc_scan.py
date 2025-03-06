@@ -95,7 +95,8 @@ def get_scan_derivative_pointwise(
     # Set the i = 0 elements of the x derivative to 1
     torch.select(dop_x, scan_dim, 0).fill_(1.0)
     D_segprod = segprod(dop_y, dim=scan_dim, offset=1)
-    inputs_grad = torch.bmm(D_segprod, outputs_grad[..., None]).squeeze(-1) * dop_x
+    # TODO: @goon - write this as a batched matmul
+    inputs_grad = (D_segprod * outputs_grad.unsqueeze(scan_dim)).sum(scan_dim + 1) * dop_x
 
     return inputs_grad
 
