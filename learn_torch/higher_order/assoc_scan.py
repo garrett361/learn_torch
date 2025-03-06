@@ -27,8 +27,13 @@ def segprod(x: torch.Tensor, dim: int = -1, offset: int = 0) -> torch.Tensor:
         torch.ones(D, D, device=x.device, dtype=bool),
         diagonal=offset - 1,
     )
-    # Expand the mask so it can be broadcast
-    ones_mask = ones_mask.expand(*x.shape[:dim], -1, -1, *x.shape[dim + 1 :])
+    # Expand the mask so it can be broadcast. Can probably do this more simply?
+    leading_dims, trailing_dims = x.shape[:dim], x.shape[dim + 1 :]
+    if leading_dims:
+        ones_mask = ones_mask[*(None for _ in leading_dims)]
+    if trailing_dims:
+        ones_mask = ones_mask[..., *(None for _ in trailing_dims)]
+    ones_mask = ones_mask.expand(*leading_dims, -1, -1, *trailing_dims)
 
     x_segprod.masked_fill_(ones_mask, 1.0)
     x_segprod = x_segprod.cumprod(dim=dim + 1)
@@ -36,7 +41,13 @@ def segprod(x: torch.Tensor, dim: int = -1, offset: int = 0) -> torch.Tensor:
         torch.ones(D, D, device=x.device, dtype=bool),
         diagonal=-1,
     )
-    zeros_mask = zeros_mask.expand(*x.shape[:dim], -1, -1, *x.shape[dim + 1 :])
+
+    if leading_dims:
+        zeros_mask = zeros_mask[*(None for _ in leading_dims)]
+    if trailing_dims:
+        zeros_mask = zeros_mask[..., *(None for _ in trailing_dims)]
+    zeros_mask = zeros_mask.expand(*leading_dims, -1, -1, *trailing_dims)
+
     x_segprod.masked_fill_(zeros_mask, 0.0)
     return x_segprod
 
@@ -60,7 +71,7 @@ def get_scan_derivative_pointwise(
     outputs: torch.Tensor,
     inputs: torch.Tensor,
     dop_pointwise: Callable[[torch.Tensor, torch.Tensor], [torch.Tensor, torch.Tensor]],
-    scan_dim: int = -1,
+    dim: int = -1,
 ):
     """
     Returns the derivative of the scan with respect to its inputs, given the upstream grad, scan
@@ -87,16 +98,16 @@ def get_scan_derivative_pointwise(
 
     So, cumprod(D[i+1:j+1]) is equal to a segprod of a shifted D with a diagonal filled with ones.
     """
-    scan_dim = scan_dim % inputs.ndim
+    dim = dim % inputs.ndim
     # For the assoc. op A(x, y), get the derivatives dA(x_i, y_{i-1})/dy_{i-1} and
     # dA(x_i,y_{i-1})/dx_i for all i, with invalid index values giving derivatives equal to 1.
     dop_pointwise_vmap = torch.vmap(dop_pointwise, out_dims=(0, 0))
-    dop_x, dop_y = dop_pointwise_vmap(inputs, outputs.roll(1, scan_dim))
+    dop_x, dop_y = dop_pointwise_vmap(inputs, outputs.roll(1, dim))
     # Set the i = 0 elements of the x derivative to 1
-    torch.select(dop_x, scan_dim, 0).fill_(1.0)
-    D_segprod = segprod(dop_y, dim=scan_dim, offset=1)
+    torch.select(dop_x, dim, 0).fill_(1.0)
+    D_segprod = segprod(dop_y, dim=dim, offset=1)
     # TODO: @goon - write this as a batched matmul
-    inputs_grad = (D_segprod * outputs_grad.unsqueeze(scan_dim)).sum(scan_dim + 1) * dop_x
+    inputs_grad = (D_segprod * outputs_grad.unsqueeze(dim)).sum(dim + 1) * dop_x
 
     return inputs_grad
 
@@ -104,13 +115,14 @@ def get_scan_derivative_pointwise(
 class TestAssocScanDerivatives:
     batch_size = 2
     d_model = 16
+    dim = 1
 
     def test_segprod(self) -> None:
         torch.manual_seed(42)
         inputs = torch.randn(self.batch_size, self.d_model)
-        inputs_segprod = segprod(inputs, dim=1)
+        inputs_segprod = segprod(inputs, dim=self.dim)
         for d in range(self.d_model):
-            expected_cumprod = inputs[:, d:].cumprod(dim=-1)
+            expected_cumprod = inputs[:, d:].cumprod(dim=self.dim)
             actual_cumprod = inputs_segprod[:, d, d:]
             torch.testing.assert_close(expected_cumprod, actual_cumprod)
             # Other elements are zeros:
@@ -121,9 +133,9 @@ class TestAssocScanDerivatives:
         torch.manual_seed(42)
         inputs = torch.randn(self.batch_size, self.d_model)
         for offset in range(1, self.d_model):
-            inputs_segprod = segprod(inputs, dim=1, offset=offset)
+            inputs_segprod = segprod(inputs, dim=self.dim, offset=offset)
             for d in range(self.d_model):
-                expected_cumprod = inputs[:, d + offset :].cumprod(dim=-1)
+                expected_cumprod = inputs[:, d + offset :].cumprod(dim=self.dim)
                 actual_cumprod = inputs_segprod[:, d, d + offset :]
                 torch.testing.assert_close(expected_cumprod, actual_cumprod)
                 # Other elements are zeros or ones:
@@ -135,23 +147,53 @@ class TestAssocScanDerivatives:
     def test_cumsum(self) -> None:
         torch.manual_seed(42)
         inputs = torch.randn(self.batch_size, self.d_model, requires_grad=True)
-        outputs = inputs.cumsum(dim=-1)
+        outputs = inputs.cumsum(dim=self.dim)
         grad_out = torch.randn_like(outputs)
         # Populate grad on inputs
         outputs.backward(grad_out)
 
         # Compute the same grads with our helper
-        inputs_grad = get_scan_derivative_pointwise(grad_out, outputs, inputs, dsum)
+        inputs_grad = get_scan_derivative_pointwise(grad_out, outputs, inputs, dsum, dim=self.dim)
         torch.testing.assert_close(inputs.grad, inputs_grad)
 
     def test_cumprod(self) -> None:
         torch.manual_seed(42)
         inputs = torch.randn(self.batch_size, self.d_model, requires_grad=True)
-        outputs = inputs.cumprod(dim=-1)
+        outputs = inputs.cumprod(dim=self.dim)
         grad_out = torch.randn_like(outputs)
         # Populate grad on inputs
 
         outputs.backward(grad_out)
         # Compute the same grads with our helper
-        inputs_grad = get_scan_derivative_pointwise(grad_out, outputs, inputs, dprod)
+        inputs_grad = get_scan_derivative_pointwise(grad_out, outputs, inputs, dprod, dim=self.dim)
+        torch.testing.assert_close(inputs.grad, inputs_grad)
+
+    def test_cumsum_multi_dim(self) -> None:
+        """
+        Same as test_cumsumbut with additional dimensions.
+        """
+        torch.manual_seed(42)
+        inputs = torch.randn(self.batch_size, self.d_model, self.d_model, requires_grad=True)
+        outputs = inputs.cumsum(dim=self.dim)
+        grad_out = torch.randn_like(outputs)
+        # Populate grad on inputs
+        outputs.backward(grad_out)
+
+        # Compute the same grads with our helper
+        inputs_grad = get_scan_derivative_pointwise(grad_out, outputs, inputs, dsum, dim=self.dim)
+        torch.testing.assert_close(inputs.grad, inputs_grad)
+
+    def test_cumprod_multi_dim(self) -> None:
+        """
+        Same as test_cumprod but with additional dimensions.
+        """
+        torch.manual_seed(42)
+        inputs = torch.randn(self.batch_size, self.d_model, self.d_model, requires_grad=True)
+        outputs = inputs.cumprod(dim=self.dim)
+        grad_out = torch.randn_like(outputs)
+        # Populate grad on inputs
+
+        outputs.backward(grad_out)
+        # Compute the same grads with our helper
+        inputs_grad = get_scan_derivative_pointwise(grad_out, outputs, inputs, dprod, dim=self.dim)
         torch.testing.assert_close(inputs.grad, inputs_grad)
