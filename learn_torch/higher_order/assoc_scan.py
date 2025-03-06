@@ -131,15 +131,16 @@ def get_scan_derivative(
     cumprod(D[i+1:j+1]) = 1 if i == j
     cumprod(D[i+1:j+1]) = 0 if i > j
     ```
-
     So, cumprod(D[i+1:j+1]) is equal to a segprod of a shifted D with a diagonal filled with ones.
+
+    The dA(x_i,y_{i-1})/dx_i derivative with i = 0 should also be understood to be 1.0.
     """
     dim = dim % inputs.ndim
     # For the assoc. op A(x, y), get the derivatives dA(x_i, y_{i-1})/dy_{i-1} and
     # dA(x_i,y_{i-1})/dx_i for all i, with invalid index values giving derivatives equal to 1.
     op_bwd_vmap = torch.vmap(op_bwd, out_dims=(0, 0))
     op_bwd_x, op_bwd_y = op_bwd_vmap(inputs, outputs.roll(1, dim))
-    # Set the i = 0 elements of the x derivative to 1
+    # Set the i=0 component of dA(x_i,y_{i-1})/dx_i to 1.0
     torch.select(op_bwd_x, dim, 0).fill_(1.0)
     D_segprod = segprod(op_bwd_y, dim=dim, offset=1)
     # TODO: @goon - write this as a batched matmul
