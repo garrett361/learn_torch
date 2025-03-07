@@ -102,7 +102,7 @@ class NonPointwiseOp:
         ] * self.W
 
 
-def get_scan_derivative(
+def get_scan_derivative_pointwise(
     outputs_grad: torch.Tensor,
     outputs: torch.Tensor,
     inputs: torch.Tensor,
@@ -199,7 +199,9 @@ class TestAssocScanDerivatives:
         outputs.backward(grad_out)
 
         # Compute the same grads with our helper
-        inputs_grad = get_scan_derivative(grad_out, outputs, inputs, sum_bwd, dim=self.dim)
+        inputs_grad = get_scan_derivative_pointwise(
+            grad_out, outputs, inputs, sum_bwd, dim=self.dim
+        )
         torch.testing.assert_close(inputs.grad, inputs_grad)
 
     def test_cumprod(self) -> None:
@@ -213,7 +215,9 @@ class TestAssocScanDerivatives:
 
         outputs.backward(grad_out)
         # Compute the same grads with our helper
-        inputs_grad = get_scan_derivative(grad_out, outputs, inputs, prod_bwd, dim=self.dim)
+        inputs_grad = get_scan_derivative_pointwise(
+            grad_out, outputs, inputs, prod_bwd, dim=self.dim
+        )
         torch.testing.assert_close(inputs.grad, inputs_grad)
 
     def test_cumsum_multi_dim(self) -> None:
@@ -229,7 +233,9 @@ class TestAssocScanDerivatives:
         outputs.backward(grad_out)
 
         # Compute the same grads with our helper
-        inputs_grad = get_scan_derivative(grad_out, outputs, inputs, sum_bwd, dim=self.dim)
+        inputs_grad = get_scan_derivative_pointwise(
+            grad_out, outputs, inputs, sum_bwd, dim=self.dim
+        )
         torch.testing.assert_close(inputs.grad, inputs_grad)
 
     def test_cumprod_multi_dim(self) -> None:
@@ -245,7 +251,9 @@ class TestAssocScanDerivatives:
         outputs.backward(grad_out)
 
         # Compute the same grads with our helper
-        inputs_grad = get_scan_derivative(grad_out, outputs, inputs, prod_bwd, dim=self.dim)
+        inputs_grad = get_scan_derivative_pointwise(
+            grad_out, outputs, inputs, prod_bwd, dim=self.dim
+        )
         torch.testing.assert_close(inputs.grad, inputs_grad)
 
     def test_non_pointwise_scan_correctness(self) -> None:
