@@ -11,6 +11,10 @@ from torch.distributed.tensor._ops.utils import register_prop_rule
 
 from dtest import DTest
 
+"""
+Example of pointwise custom op registration for DTensor.
+"""
+
 
 # Op def and registration
 @triton.jit
