@@ -1,3 +1,4 @@
+import pytest
 import torch
 import torch.nn as nn
 from torch.distributed.device_mesh import init_device_mesh
@@ -28,13 +29,15 @@ class TestTP(DTest):
         inputs = torch.randn(1, model.d_model)
         outputs = model(inputs)
 
+    @pytest.mark.world_size(2)
+    @pytest.mark.cpu
     def test_compiled(self) -> None:
         torch.manual_seed(42)
         model = MLP(self.device)
-        tp_mesh = init_device_mesh("cuda", (self.world_size,))
+        tp_mesh = init_device_mesh(self.device_type, (self.world_size,))
         model = parallelize_module(
             model, tp_mesh, {"lin0": ColwiseParallel(), "lin1": RowwiseParallel()}
         )
         model_compiled = torch.compile(model, backend="inductor", fullgraph=True)
-        inputs = torch.randn(1, model.d_model)
+        inputs = torch.randn(1, model.d_model, device=self.device)
         outputs = model_compiled(inputs)

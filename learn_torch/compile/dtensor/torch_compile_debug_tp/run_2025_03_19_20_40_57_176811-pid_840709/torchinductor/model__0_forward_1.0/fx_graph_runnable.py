@@ -12,7 +12,7 @@ import torch._functorch.config
 import torch.fx.experimental._config
 torch._dynamo.config.traceable_tensor_subclasses = set()
 torch._dynamo.config._ddp_optimization_mode = ['ddp_optimizer', 'python_reducer', 'python_reducer_without_compiled_forward', 'no_optimization']
-torch._dynamo.config._save_config_ignore = {'repro_after', 'constant_functions', 'skipfiles_inline_module_allowlist', 'repro_level'}
+torch._dynamo.config._save_config_ignore = {'repro_after', 'repro_level', 'skipfiles_inline_module_allowlist', 'constant_functions'}
 torch._dynamo.config.reorderable_logging_functions = set()
 torch._inductor.config.pre_grad_fusion_options = {}
 torch._inductor.config.post_grad_fusion_options = {}
@@ -58,24 +58,23 @@ class Repro(torch.nn.Module):
     
     
     def forward(self, primals_1, primals_2, primals_3):
-        device_put = torch.ops.prims.device_put.default(primals_1, device(type='cuda', index=0));  primals_1 = None
         permute = torch.ops.aten.permute.default(primals_2, [1, 0]);  primals_2 = None
-        mm = torch.ops.aten.mm.default(device_put, permute);  permute = None
+        mm = torch.ops.aten.mm.default(primals_1, permute);  permute = None
         relu = torch.ops.aten.relu.default(mm);  mm = None
         permute_1 = torch.ops.aten.permute.default(primals_3, [1, 0]);  primals_3 = None
         mm_1 = torch.ops.aten.mm.default(relu, permute_1)
-        all_reduce = torch.ops._c10d_functional.all_reduce.default(mm_1, 'sum', '0');  mm_1 = None
+        all_reduce = torch.ops._c10d_functional.all_reduce.default(mm_1, 'sum', '1');  mm_1 = None
         wait_tensor = torch.ops._c10d_functional.wait_tensor.default(all_reduce);  all_reduce = None
         permute_6 = torch.ops.aten.permute.default(permute_1, [1, 0]);  permute_1 = None
-        return (wait_tensor, device_put, relu, permute_6)
+        return (wait_tensor, primals_1, relu, permute_6)
         
 def load_args(reader):
     buf0 = reader.storage(None, 128)
     reader.tensor(buf0, (1, 32), is_leaf=True)  # primals_1
-    buf1 = reader.storage(None, 1024, device=device(type='cuda', index=0))
-    reader.tensor(buf1, (8, 32), is_leaf=True)  # primals_2
-    buf2 = reader.storage(None, 1024, device=device(type='cuda', index=0))
-    reader.tensor(buf2, (32, 8), is_leaf=True)  # primals_3
+    buf1 = reader.storage(None, 2048)
+    reader.tensor(buf1, (16, 32), is_leaf=True)  # primals_2
+    buf2 = reader.storage(None, 2048)
+    reader.tensor(buf2, (32, 16), is_leaf=True)  # primals_3
 load_args._version = 0
 mod = Repro()
 if __name__ == '__main__':
