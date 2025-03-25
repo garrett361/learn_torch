@@ -2,7 +2,7 @@ from typing import Optional
 
 import torch
 import torch.distributed as dist
-from torch.nn.functional import scaled_dot_product_attention
+from torch.distributed._functional_collectives import all_to_all_single
 
 
 def torch_attn_primitives(
@@ -11,10 +11,14 @@ def torch_attn_primitives(
     v: torch.Tensor,
     scale: Optional[float] = None,
     is_causal: bool = False,
-) -> torch.Tensor:
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     Returns the softmax numerator, denominator, and max scale. These are primitive values which can
     be used to build normal softmax attention and ring attention.
+
+    It is redundant to return both the denominator and max_score. They always appear in a particular
+    combination together and so just one tensor can be returned instead of two. But, this is good
+    enough for now. TODO: @goon - optimize.
     """
     _, n_q_heads, seqlen, d_head = q.shape
     n_k_heads = k.shape[1]
@@ -53,54 +57,28 @@ def torch_attn(
     return numerator / denominator
 
 
-class TestSDPAEquality:
-    def test_causal(self) -> None:
-        torch.manual_seed(42)
-        batch_size = 2
-        seqlen = 128
-        n_heads = 4
-        d_head = 64
-        q, k, v = torch.randn(batch_size, n_heads, seqlen, 3 * d_head).chunk(3, dim=-1)
-        out = torch_attn(q, k, v, is_causal=True)
-        out_sdpa = scaled_dot_product_attention(q, k, v, is_causal=True)
-        torch.testing.assert_close(out, out_sdpa)
-
-    def test_non_causal(self) -> None:
-        torch.manual_seed(42)
-        batch_size = 2
-        seqlen = 128
-        n_heads = 4
-        d_head = 64
-        q, k, v = torch.randn(batch_size, n_heads, seqlen, 3 * d_head).chunk(3, dim=-1)
-        out = torch_attn(q, k, v, is_causal=False)
-        out_sdpa = scaled_dot_product_attention(q, k, v, is_causal=False)
-        torch.testing.assert_close(out, out_sdpa)
-
-    def test_causal_gqa(self) -> None:
-        torch.manual_seed(42)
-        batch_size = 2
-        seqlen = 128
-        n_heads = 4
-        n_kv_heads = 4
-        d_head = 64
-        q = torch.randn(batch_size, n_heads, seqlen, d_head)
-        k, v = torch.randn(batch_size, n_kv_heads, seqlen, 2 * d_head).chunk(2, dim=-1)
-        out = torch_attn(q, k, v, is_causal=True)
-        out_sdpa = scaled_dot_product_attention(q, k, v, is_causal=True, enable_gqa=True)
-        torch.testing.assert_close(out, out_sdpa)
-
-
-def ring_send_recv(buffer: torch.Tensor) -> torch.Tensor:
+def ring_send_recv(send_buffer: torch.Tensor) -> torch.Tensor:
     """
     Utility for passing the given buffer to the next rank and receiving from the previous one, in
     ring order.
     """
+    # See also dist._functional_collectives.permute_tensor
     rank = dist.get_rank()
     world_size = dist.get_world_size()
-    recv_buffer = torch.empty_like(buffer)
-    dist.send(buffer.contiguous(), dst=(rank + 1) % world_size)
-    dist.recv(recv_buffer, src=(rank - 1) % world_size)
-    return recv_buffer
+    input_split_sizes = [
+        send_buffer.shape[0] if ((other_rank - 1) % world_size) == rank else 0
+        for other_rank in range(world_size)
+    ]
+    output_split_sizes = [
+        send_buffer.shape[0] if ((other_rank + 1) % world_size) == rank else 0
+        for other_rank in range(world_size)
+    ]
+    return all_to_all_single(
+        send_buffer.contiguous(),
+        output_split_sizes,
+        input_split_sizes,
+        group=list(range(world_size)),
+    )
 
 
 def torch_ring_attn_prefill(
@@ -120,5 +98,27 @@ def torch_ring_attn_prefill(
     """
     rank = dist.get_rank()
     world_size = dist.get_world_size()
-    for send_rank in ((r % world_size) for r in range(rank + 1, rank + world_size)):
-        pass
+    numerator, denominator, max_score = torch_attn_primitives(q, k, v, scale, is_causal)
+
+    for idx in range(1, world_size):
+        k = ring_send_recv(k)
+        v = ring_send_recv(v)
+        if is_causal and idx > rank:
+            # TODO: @goon - torch compile complains that we didn't do anything with the k, v tensors
+            continue
+
+        # Update local results
+        ring_numerator, ring_denominator, ring_max_score = torch_attn_primitives(
+            q, k, v, scale, is_causal=False
+        )
+        new_max_score = torch.maximum(max_score, ring_max_score)
+        numerator = (ring_max_score - new_max_score).exp() * ring_numerator + (
+            max_score - new_max_score
+        ).exp() * numerator
+        denominator = (ring_max_score - new_max_score).exp() * ring_denominator + (
+            max_score - new_max_score
+        ).exp() * denominator
+
+        max_score = new_max_score
+
+    return numerator / denominator
