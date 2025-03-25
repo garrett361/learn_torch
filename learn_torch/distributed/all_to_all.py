@@ -1,5 +1,6 @@
 import torch
 import torch.distributed as dist
+import torch.distributed._functional_collectives as funcol
 
 from dtest import DTest
 
@@ -33,6 +34,7 @@ class TestAllToAll(DTest):
         ]
         # Seems like output_split_sizes is the conjugate, determining how many elements should be
         # received from which ranks: numel_from_rank[r] = output_split_sizes[r], schematically.
+        # Must have sum(output_split_sizes) == outputs.numel().
         output_split_sizes = [
             t.numel() if ((rank - 1) % self.world_size) == self.rank else 0
             for rank in range(self.world_size)
@@ -61,3 +63,30 @@ class TestAllToAll(DTest):
             )
         else:
             assert not out.numel()
+
+    def test_permute_autograd(self) -> None:
+        """
+        Use the {input,output}_split_sizes args to pass tensors around.
+        """
+        t = torch.tensor([self.rank], device=self.device)
+        # input_split_sizes determines where chunk boundaries on the inputs are and how many
+        # elements to send to each rank: send_numel_to_rank[r] = input_split_sizes[r],
+        # schematically, with
+        # Must have sum(input_split_sizes) == inputs.numel().
+        input_split_sizes = [
+            t.numel() if ((rank + 1) % self.world_size) == self.rank else 0
+            for rank in range(self.world_size)
+        ]
+        # Seems like output_split_sizes is the conjugate, determining how many elements should be
+        # received from which ranks: numel_from_rank[r] = output_split_sizes[r], schematically.
+        # Must have sum(output_split_sizes) == outputs.numel().
+        output_split_sizes = [
+            t.numel() if ((rank - 1) % self.world_size) == self.rank else 0
+            for rank in range(self.world_size)
+        ]
+        out = funcol.all_to_all_single_autograd(
+            t, output_split_sizes, input_split_sizes, group=dist.group.WORLD
+        )
+        torch.testing.assert_close(
+            out, torch.tensor([(self.rank + 1) % self.world_size], device=self.device)
+        )
