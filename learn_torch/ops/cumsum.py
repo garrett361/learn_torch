@@ -26,14 +26,14 @@ def cumsum(input: torch.Tensor, dim: int) -> torch.Tensor:
 
 
 class TestCumsum:
-    @pytest.mark.parametrize("dim", [1, 2, -1])
+    @pytest.mark.parametrize("dim", [1, 2, -1, -2])
     def test_fwd(self, dim: int) -> None:
         t = torch.randn(2, 32, 64)
         t_cs = cumsum(t, dim=dim)
         t_cs_torch = t.cumsum(dim=dim)
         torch.testing.assert_close(t_cs, t_cs_torch)
 
-    @pytest.mark.parametrize("dim", [1, 2, -1])
+    @pytest.mark.parametrize("dim", [1, 2, -1, -2])
     def test_bwd(self, dim: int) -> None:
         t = torch.randn(2, 32, 64, requires_grad=True)
         t_copy = deepcopy(t)
