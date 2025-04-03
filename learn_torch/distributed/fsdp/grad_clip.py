@@ -25,12 +25,15 @@ def _test_grads_fsdp2(model: nn.Module, model_fsdp: nn.Module, tol: float) -> No
                 if p.grad is None:
                     assert p_fsdp.grad is None
                     return
-                grad = p.grad
-                grad_fsdp = p_fsdp.grad
-                if isinstance(grad_fsdp, DTensor):
-                    grad_fsdp = grad_fsdp.full_tensor()
+                g = p.grad
+                g_fsdp = p_fsdp.grad
+                if isinstance(g_fsdp, DTensor):
+                    g_fsdp = g_fsdp.full_tensor()
                 try:
-                    torch.testing.assert_close(grad, grad_fsdp, atol=tol, rtol=tol)
+                    torch.testing.assert_close(g, g_fsdp, atol=tol, rtol=tol)
+                    g_norm = nn.utils.get_total_norm(g)
+                    g_fsdp_norm = nn.utils.get_total_norm(g_fsdp)
+                    print(f"Grads agree on {n=}, {g_norm=}, {g_fsdp_norm=}")
                 except Exception as e:
                     raise RuntimeError(f"Failed on {n=}") from e
 
@@ -48,6 +51,9 @@ def _test_grads_fsdp1(model: nn.Module, model_fsdp: nn.Module, tol: float) -> No
             g = grads[n]
             try:
                 torch.testing.assert_close(g, g_fsdp, atol=tol, rtol=tol)
+                g_norm = nn.utils.get_total_norm(g)
+                g_fsdp_norm = nn.utils.get_total_norm(g_fsdp)
+                print(f"Grads agree on {n=}, {g_norm=}, {g_fsdp_norm=}")
             except Exception as e:
                 raise RuntimeError(f"Failed on {n=}") from e
 
@@ -87,12 +93,14 @@ class TestGradClipFSDP(DTest):
         (100 * outputs_fsdp.mean()).backward()
 
         # Grads agree:
+        self.print_rank("Test grads pre-clip:")
         _test_grads_fsdp2(model, model_fsdp, 1e-2)
 
         # Also agree after clipping:
         grad_norm = nn.utils.clip_grad_norm_(model.parameters(), self.clip)
         grad_norm_fsdp = nn.utils.clip_grad_norm_(model_fsdp.parameters(), self.clip)
-        assert grad_norm > self.clip, "clip not needed"
+        assert grad_norm > self.clip, "clip is trivial, increase grad size"
+        self.print_rank("Test grads post-clip:")
         _test_grads_fsdp2(model, model_fsdp, 1e-2)
 
         # Calling full_tensor() gives the proper norm
@@ -141,11 +149,13 @@ class TestGradClipFSDP(DTest):
         (100 * outputs.mean()).backward()
         (100 * outputs_fsdp.mean()).backward()
 
+        self.print_rank("Test grads pre-clip:")
         _test_grads_fsdp1(model, model_fsdp, 1e-2)
 
         grad_norm = nn.utils.clip_grad_norm_(model.parameters(), self.clip)
         grad_norm_fsdp = model_fsdp.clip_grad_norm_(self.clip)
-        assert grad_norm > self.clip, "clip not needed"
+        assert grad_norm > self.clip, "clip is trivial, increase grad size"
+        self.print_rank("Test grads post-clip:")
         _test_grads_fsdp1(model, model_fsdp, 1e-2)
 
         # Passes
