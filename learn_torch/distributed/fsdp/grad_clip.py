@@ -56,6 +56,7 @@ class TestGradClipFSDP(DTest):
     d_model = 128
     n_layers = 3
     batch_size = 2
+    clip = 1.0
 
     def get_model(self) -> nn.Module:
         return nn.Sequential(
@@ -89,8 +90,9 @@ class TestGradClipFSDP(DTest):
         _test_grads_fsdp2(model, model_fsdp, 1e-2)
 
         # Also agree after clipping:
-        grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-        grad_norm_fsdp = nn.utils.clip_grad_norm_(model_fsdp.parameters(), 1.0)
+        grad_norm = nn.utils.clip_grad_norm_(model.parameters(), self.clip)
+        grad_norm_fsdp = nn.utils.clip_grad_norm_(model_fsdp.parameters(), self.clip)
+        assert grad_norm > self.clip, "clip not needed"
         _test_grads_fsdp2(model, model_fsdp, 1e-2)
 
         # Calling full_tensor() gives the proper norm
@@ -141,8 +143,9 @@ class TestGradClipFSDP(DTest):
 
         _test_grads_fsdp1(model, model_fsdp, 1e-2)
 
-        grad_norm = nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-        grad_norm_fsdp = model_fsdp.clip_grad_norm_(1.0)
+        grad_norm = nn.utils.clip_grad_norm_(model.parameters(), self.clip)
+        grad_norm_fsdp = model_fsdp.clip_grad_norm_(self.clip)
+        assert grad_norm > self.clip, "clip not needed"
         _test_grads_fsdp1(model, model_fsdp, 1e-2)
 
         # Passes
