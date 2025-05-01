@@ -21,7 +21,7 @@ def send_recv(send: torch.Tensor, recv: torch.Tensor, rank: int, world_size: int
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--dim", type=int, default=4096)
-    parser.add_argument("--isend", action="store_true")
+    parser.add_argument("--batched", action="store_true")
 
     args = parser.parse_args()
     print(f"{args=}")
@@ -36,11 +36,11 @@ if __name__ == "__main__":
     recv = torch.empty_like(send)
     try:
         dist.init_process_group(backend="nccl")
-        if args.isend:
+        if args.batched:
             isend_irecv(send, recv, RANK, WORLD_SIZE)
         else:
             send_recv(send, recv, RANK, WORLD_SIZE)
-        torch.barrier()
+        dist.barrier()
         torch.testing.assert_close(recv, torch.full_like(recv, (RANK - 1) % WORLD_SIZE))
         print(f"SUCCESS on {RANK=}")
     finally:
