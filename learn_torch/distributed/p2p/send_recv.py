@@ -14,8 +14,12 @@ def isend_irecv(send: torch.Tensor, recv: torch.Tensor, rank: int, world_size: i
 
 
 def send_recv(send: torch.Tensor, recv: torch.Tensor, rank: int, world_size: int):
-    dist.send(send, (rank + 1) % world_size)
-    dist.recv(recv, (rank - 1) % world_size)
+    for send_rank in range(world_size):
+        recv_rank = (send_rank + 1) % world_size
+        if send_rank == rank:
+            dist.send(send, recv_rank)
+        elif recv_rank == rank:
+            dist.recv(recv, send_rank)
 
 
 if __name__ == "__main__":
