@@ -4,6 +4,10 @@ import os
 import torch
 import torch.distributed as dist
 
+"""
+Send simple tensors in a ring with send/recv or isend/irecv.
+"""
+
 
 def isend_irecv(send: torch.Tensor, recv: torch.Tensor, rank: int, world_size: int):
     ops = []
