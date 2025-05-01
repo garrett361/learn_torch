@@ -36,6 +36,7 @@ if __name__ == "__main__":
     recv = torch.empty_like(send)
     try:
         dist.init_process_group(backend="nccl")
+        dist.barrier()
         if args.batched:
             isend_irecv(send, recv, RANK, WORLD_SIZE)
         else:
