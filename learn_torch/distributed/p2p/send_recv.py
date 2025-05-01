@@ -32,8 +32,8 @@ if __name__ == "__main__":
 
     device = torch.device(f"cuda:{LOCAL_RANK}")
     torch.cuda.set_device(device)
-    send = torch.randn(args.dim, device=device)
-    recv = torch.empty(args.dim, device=device)
+    send = torch.full((args.dim,), RANK, device=device)
+    recv = torch.empty_like(send)
     try:
         dist.init_process_group(backend="nccl")
         if args.isend:
@@ -41,6 +41,7 @@ if __name__ == "__main__":
         else:
             send_recv(send, recv, RANK, WORLD_SIZE)
         torch.barrier()
+        torch.testing.assert_close(recv, torch.full_like(recv, (RANK - 1) % WORLD_SIZE))
         print(f"SUCCESS on {RANK=}")
     finally:
         dist.destroy_process_group()
