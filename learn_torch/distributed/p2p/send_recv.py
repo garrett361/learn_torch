@@ -5,7 +5,7 @@ import torch
 import torch.distributed as dist
 
 
-def isend_irecv(send: torch.Tensor, recv: torch.Tensor, rank: int, world_size: int) -> torch.Tensor:
+def isend_irecv(send: torch.Tensor, recv: torch.Tensor, rank: int, world_size: int):
     ops = []
     ops.append(dist.P2POp(dist.isend, send, (rank + 1) % world_size))
     ops.append(dist.P2POp(dist.irecv, recv, (rank - 1) % world_size))
@@ -13,7 +13,7 @@ def isend_irecv(send: torch.Tensor, recv: torch.Tensor, rank: int, world_size: i
         op.wait()
 
 
-def send_recv(send: torch.Tensor, recv: torch.Tensor, rank: int, world_size: int) -> torch.Tensor:
+def send_recv(send: torch.Tensor, recv: torch.Tensor, rank: int, world_size: int):
     dist.send(send, (rank + 1) % world_size)
     dist.recv(recv, (rank - 1) % world_size)
 
