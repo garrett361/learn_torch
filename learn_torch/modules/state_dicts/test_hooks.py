@@ -12,6 +12,10 @@ class Experts(nn.Module):
 
 
 class ExpertsConsolidated(nn.Module):
+    """
+    Same as Experts, but with the weights stacked into a single block.
+    """
+
     def __init__(self, d_model: int, n_experts: int) -> None:
         super().__init__()
         self.d_model = d_model
