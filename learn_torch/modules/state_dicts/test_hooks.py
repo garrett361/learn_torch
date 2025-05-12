@@ -75,8 +75,8 @@ class ExpertsConsolidated(nn.Module):
 
 
 class TestStateDictHooks:
-    d_model = 128
     n_experts = 4
+    d_model = 2**20 // 4 // n_experts  # 1MiB param sizes
 
     def test_hooks(self):
         torch.manual_seed(42)
@@ -110,10 +110,13 @@ class TestStateDictHooks:
         # Load the non-consolidated state dict back into the consolidated model:
         exps_consol.load_state_dict(exps.state_dict())
 
-        # Get the consolidated state dict again and check equality (by value; _weights won't be
-        # the same due to the new tensor alloc via stacking)
+        # Get the consolidated state dict again and check equality (by value; _weights won't be the
+        # same pytorch object due to the new tensor alloc via stacking)
         exps_consol_state_dict_again = exps_consol.state_dict()
         for k, p in exps_consol_state_dict_again.items():
             p_orig = exps_consol_state_dict[k]
             assert p.shape == p_orig.shape
             torch.testing.assert_close(p, exps_consol_state_dict[k])
+
+        torch.save(exps_state_dict, "exps_state_dict.pt")
+        torch.save(exps_consol_state_dict, "exps_consol_state_dict.pt")
