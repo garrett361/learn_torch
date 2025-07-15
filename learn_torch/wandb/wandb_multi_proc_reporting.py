@@ -38,8 +38,7 @@ def main(project_name, run_id, rank, local_rank):
         if not rank:
             stats["loss"] = random.random()
 
-        # wandb.log(stats, step=step)
-        wandb.log(stats)
+        wandb.log(stats, step=step)
 
 
 def parse_args():
