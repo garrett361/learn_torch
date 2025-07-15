@@ -1,5 +1,6 @@
 import argparse
 import os
+import random
 
 import torch
 import torch.distributed as dist
@@ -21,7 +22,11 @@ def main(project_name, run_id, rank):
     print(f"[{rank=}]: {x_label=} {x_primary=} {run_id=} {run.id=}")
 
     # Log the rank as a wandb data point
-    wandb.log({"rank": rank})
+    # Log some rank-specific stats and also a common stat to see how it is processed
+    for step in range(1, 11):
+        stats = {f"stat_on_{rank}": random.random(), "loss": rank}
+
+        wandb.log(stats, step=step)
 
 
 def parse_args():
