@@ -7,16 +7,18 @@ import wandb
 
 
 def main(project_name, run_id, rank):
+    x_primary = rank == 0
+    x_label = f"rank_{rank}"
     run = wandb.init(
         project=project_name,
         settings=wandb.Settings(
-            x_label=f"rank_{rank}",
+            x_label=x_label,
             mode="shared",
-            x_primary=rank == 0,
+            x_primary=x_primary,
         ),
         id=run_id,
     )
-    print(f"[{rank=}]: {run_id=} {run.id=}")
+    print(f"[{rank=}]: {x_label=} {x_primary=} {run_id=} {run.id=}")
 
     # Log the rank as a wandb data point
     wandb.log({"rank": rank})
