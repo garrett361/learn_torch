@@ -31,9 +31,11 @@ def main(project_name, run_id, rank, local_rank):
     print(f"[{rank=}]: {x_label=} {x_primary=} {run_id=} {run.id=}")
 
     # Log the rank as a wandb data point
-    # Log some rank-specific stats and also a common stat to see how it is processed
+    # Log some rank-specific stats
     for step in range(1, 11):
-        stats = {f"stat_on_{rank}": random.random(), "loss": rank}
+        stats = {f"stat_on_{rank}": random.random()}
+        if not rank:
+            stats["loss"] = random.random()
 
         # wandb.log(stats, step=step)
         wandb.log(stats)
