@@ -24,8 +24,8 @@ def main(project_name, run_id, rank):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Multi-process wandb reporting")
-    parser.add_argument("--project-name", required=True, help="Wandb project name")
-    parser.add_argument("--run-id", required=True, help="Wandb run ID")
+    parser.add_argument("--project_name", required=True, help="Wandb project name")
+    parser.add_argument("--run_id", required=True, help="Wandb run ID")
     return parser.parse_args()
 
 
