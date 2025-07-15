@@ -22,11 +22,7 @@ def main(project_name, run_id, rank, local_rank):
         settings.x_primary = False
         # Do not change the state of the run on run.finish().
         settings.x_update_finish_state = False
-    run = wandb.init(
-        project=project_name,
-        settings=settings,
-        id=run_id,
-    )
+    run = wandb.init(project=project_name, settings=settings, id=run_id, resume="allow")
 
     print(f"[{rank=}]: {x_label=} {x_primary=} {run_id=} {run.id=}")
 
