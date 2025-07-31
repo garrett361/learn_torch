@@ -19,6 +19,16 @@ def torch_attn_primitives(
     It is redundant to return both the denominator and max_score. They always appear in a particular
     combination together and so just one tensor can be returned instead of two. But, this is good
     enough for now. TODO: @goon - optimize.
+
+    NOTE: if any of the below aten ops are supported, we can also build ring attention using them,
+    but we assume they are not generally available:
+    * aten._scaled_dot_product_flash_attention
+    * aten._scaled_dot_product_efficient_attention
+    * aten._scaled_dot_product_cudnn_attention
+    See the native torch CP attn implementation: https://github.com/pytorch/pytorch/blob/e7cc42df58a86bee05944f6e80c535aa1d099443/torch/distributed/tensor/experimental/_attention.py?plain=1#L1
+
+    NOTE: if the model uses RoPE, some care must also be taken that RoPE is properly applied.
+    Namely, different CP ranks need to offset their seq idx positions appropriately.
     """
     _, n_q_heads, seqlen, d_head = q.shape
     n_k_heads = k.shape[1]
