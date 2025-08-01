@@ -1,6 +1,11 @@
 [project]
 name="learn_torch"
 version="0.0.0"
+dependencies = [
+    "torch",
+    "numpy",
+]
+
 
 [tool.setuptools]
 py-modules = ["learn_torch"]
