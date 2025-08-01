@@ -9,6 +9,7 @@ Send simple tensors in a ring with send/recv or isend/irecv.
 """
 
 
+@torch.compile(fullgraph=True)
 def isend_irecv(send: torch.Tensor, recv: torch.Tensor, rank: int, world_size: int):
     ops = []
     ops.append(dist.P2POp(dist.isend, send, (rank + 1) % world_size))
@@ -17,6 +18,7 @@ def isend_irecv(send: torch.Tensor, recv: torch.Tensor, rank: int, world_size: i
         op.wait()
 
 
+@torch.compile(fullgraph=True)
 def send_recv(send: torch.Tensor, recv: torch.Tensor, rank: int, world_size: int):
     for send_rank in range(world_size):
         recv_rank = (send_rank + 1) % world_size
