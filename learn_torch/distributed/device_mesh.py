@@ -1,6 +1,8 @@
-from dtest import DTest
+import pytest
 import torch
 import torch.distributed as dist
+
+from dtest import DTest
 
 
 class TestDeviceMesh(DTest):
@@ -30,3 +32,19 @@ class TestDeviceMesh(DTest):
         dist.all_reduce(t, group=mesh.get_group(0))
         print(t)
         assert mesh is not None
+
+    @pytest.mark.world_size(2 * 3 * 4)
+    def test_3d_mesh_slicing(self) -> None:
+        mesh = dist.device_mesh.init_device_mesh(
+            device_type="cpu",
+            mesh_shape=(2, 3, 4),
+            mesh_dim_names=("0", "1", "2"),
+        )
+        slice_01 = mesh["0", "1"]
+        assert slice_01.shape == (2, 3), f"{slice_01.shape=}"
+        slice_12 = mesh["1", "2"]
+        assert slice_12.shape == (3, 4), f"{slice_12.shape=}"
+
+        slice_01_flat = slice_01._flatten()
+        assert slice_01_flat.ndim == 1
+        assert slice_01_flat.mesh_dim_names[0] == "0_1"
