@@ -30,7 +30,7 @@ if __name__ == "__main__":
             2, dim=-1
         )
 
-        # SDPA Basedine
+        # SDPA Baseline
         out_sdpa = scaled_dot_product_attention(q, k, v, is_causal=True, enable_gqa=True)
 
         # Ring impl
