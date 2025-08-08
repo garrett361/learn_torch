@@ -20,6 +20,8 @@ def torch_attn_primitives(
     combination together and so just one tensor can be returned instead of two. But, this is good
     enough for now. TODO: @goon - optimize.
 
+    TODO: @goon - rewrite in terms of aten._scaled_dot_product_flash_attention.default
+
     NOTE: if any of the below aten ops are supported, we can also build ring attention using them,
     but we assume they are not generally available:
     * aten._scaled_dot_product_flash_attention
