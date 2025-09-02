@@ -113,6 +113,7 @@ def torch_ring_attn_prefill(
     numerator, denominator, max_score = torch_attn_primitives(q, k, v, scale, is_causal)
 
     for idx in range(1, world_size):
+        # TODO: @goon - combine into single collective call
         k = ring_send_recv(k)
         v = ring_send_recv(v)
         if is_causal and idx > rank:
