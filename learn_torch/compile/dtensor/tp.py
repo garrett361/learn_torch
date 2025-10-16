@@ -31,7 +31,7 @@ class TestTP(DTest):
 
     @pytest.mark.world_size(2)
     @pytest.mark.cpu
-    def test_compiled(self) -> None:
+    def test_compiled(self, world_size: int) -> None:
         torch.manual_seed(42)
         model = MLP(self.device)
         tp_mesh = init_device_mesh(self.device_type, (self.world_size,))

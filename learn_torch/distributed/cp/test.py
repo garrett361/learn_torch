@@ -43,7 +43,7 @@ class TestRingAttn(DTest):
 
     @pytest.mark.cpu
     @pytest.mark.world_size(4)
-    def test(self) -> None:
+    def test(self, world_size: int) -> None:
         torch.manual_seed(42)
         q = torch.randn(self.batch_size, self.n_heads, self.seqlen, self.d_head, device=self.device)
         k, v = torch.randn(
@@ -66,7 +66,7 @@ class TestRingAttn(DTest):
 
     @pytest.mark.cpu
     @pytest.mark.world_size(4)
-    def test_compiled(self) -> None:
+    def test_compiled(self, world_size: int) -> None:
         torch.manual_seed(42)
         q = torch.randn(self.batch_size, self.n_heads, self.seqlen, self.d_head, device=self.device)
         k, v = torch.randn(

@@ -34,7 +34,7 @@ class TestDeviceMesh(DTest):
         assert mesh is not None
 
     @pytest.mark.world_size(2 * 3 * 4)
-    def test_3d_mesh_slicing(self) -> None:
+    def test_3d_mesh_slicing(self, world_size: int) -> None:
         mesh = dist.device_mesh.init_device_mesh(
             device_type="cpu",
             mesh_shape=(2, 3, 4),

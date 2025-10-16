@@ -1,11 +1,11 @@
 import argparse
-
 import os
 
 import torch
 import torch.nn as nn
 from torch.distributed import destroy_process_group, init_process_group
 from torch.distributed._composable.fsdp import fully_shard
+from torch.distributed.device_mesh import DeviceMesh, init_device_mesh
 
 """
 **Tested against 2.6.0!**
@@ -54,12 +54,12 @@ class BasicModel(nn.Module):
         return outputs
 
 
-def get_fsdp_model(device: torch.device, dtype: torch.dtype) -> nn.Module:
+def get_fsdp_model(device: torch.device, dtype: torch.dtype, mesh: DeviceMesh) -> nn.Module:
     model = nn.Sequential(*(BasicModel(args.d_model, device, dtype) for _ in range(3)))
     for module in model.modules():
         if isinstance(module, BasicModel):
-            fully_shard(module)
-    fully_shard(model)
+            fully_shard(module, mesh=mesh)
+    fully_shard(model, mesh=mesh)
     return model
 
 
@@ -68,12 +68,15 @@ def main(args: argparse.Namespace) -> None:
         print(f"{torch.__version__=}")
 
     local_rank = int(os.environ["LOCAL_RANK"])
-    device = torch.device(f"cuda:{local_rank}")
+    world_size = int(os.environ["WORLD_SIZE"])
+    device_type = "cpu" if args.cpu else "cuda"
+    device = torch.device(f"{device_type}:{local_rank}")
     dtype = torch.bfloat16
-    torch.cuda.set_device(device)
-    init_process_group("nccl")
-
-    fsdp_model = get_fsdp_model(device, dtype)
+    if not args.cpu:
+        torch.cuda.set_device(device)
+    init_process_group("gloo" if args.cpu else "nccl")
+    mesh = init_device_mesh(device_type=device_type, mesh_shape=(world_size,))
+    fsdp_model = get_fsdp_model(device, dtype, mesh)
     if not local_rank:
         print(fsdp_model)
 
@@ -84,6 +87,7 @@ def main(args: argparse.Namespace) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--d_model", type=int, default=16)
+    parser.add_argument("--cpu", action="store_true")
     args = parser.parse_args()
     try:
         main(args)
