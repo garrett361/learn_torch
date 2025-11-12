@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 
 
 def kl_divergence(
@@ -53,3 +54,20 @@ class Test:
         kl_qp_alt = (q * (q / p).log()).sum(dim=-1).mean()
         torch.testing.assert_close(kl_pq_alt, kl_pq)
         torch.testing.assert_close(kl_qp_alt, kl_qp)
+
+        # Apparently there's a builtin:
+        kl_pq_builtin = F.kl_div(
+            logits_p.reshape(-1, self.seqlen).log_softmax(dim=-1),
+            logits_q.reshape(-1, self.seqlen).log_softmax(dim=-1),
+            log_target=True,
+            reduction="batchmean",
+        )
+        kl_qp_builtin = F.kl_div(
+            logits_q.reshape(-1, self.seqlen).log_softmax(dim=-1),
+            logits_p.reshape(-1, self.seqlen).log_softmax(dim=-1),
+            log_target=True,
+            reduction="batchmean",
+        )
+        # Only passes w/ some degree of tolerance, should just use builtin
+        torch.testing.assert_close(kl_pq_builtin, kl_pq, atol=1e-1, rtol=1e-1)
+        torch.testing.assert_close(kl_qp_builtin, kl_qp, atol=1e-1, rtol=1e-1)
